@@ -27,6 +27,8 @@ module.exports = {
             name: data.name,
             phone: phone,
             email: data.email,
+            city: data.city,
+            occupation: data.occupation,
             profileImage: imageUrl
         }
     },
@@ -53,9 +55,9 @@ module.exports = {
             accountHolderName: bankData.accountHolderName
         }
     },
-    slabSettingFormatter :(slabData) => {
+    slabSettingFormatter: (slabData) => {
         const slabSettingId = randomBytes(4).toString('hex')
-        let slot = 1/((slabData.persent * 1) / 100)
+        let slot = 1 / ((slabData.persent * 1) / 100)
         return {
             slabSettingId: slabSettingId,
             amount: slabData.amount,

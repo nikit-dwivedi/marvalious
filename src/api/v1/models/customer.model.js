@@ -22,6 +22,12 @@ const customerSchema = new Schema({
     email: {
         type: String,
     },
+    city: {
+        type: String
+    },
+    occupation: {
+        type: String
+    },
     profileImage: {
         type: String
     },
