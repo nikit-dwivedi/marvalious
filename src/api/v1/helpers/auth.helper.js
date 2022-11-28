@@ -63,6 +63,7 @@ exports.verifyOtp = async (reqId, otp) => {
     try {
         const newReqId = randomBytes(4).toString('hex')
         const userData = await authModel.findOne({ reqId });
+        console.log("reqId===>", newReqId);
         if (!userData) {
             return responseFormater(false, "invalid request id")
         }
@@ -70,11 +71,12 @@ exports.verifyOtp = async (reqId, otp) => {
             return responseFormater(false, "invalid otp")
         }
         const customId = await customerById(userData.userId)
-        userData.customId = ""
+        let token = ""
         if (customId.status) {
-            userData.customId = customId.data.customerId
+            token = generateUserToken(customId.data)
+        } else {
+            token = generateUserToken(userData)
         }
-        const token = generateUserToken(userData)
         userData.noOfOtp = 0
         userData.otp = 0
         userData.reqId = newReqId

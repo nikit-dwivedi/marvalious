@@ -3,10 +3,12 @@ const Schema = mongoose.Schema;
 
 const slabSchema = new Schema({
     totalSlab: {
-        type: Number
+        type: Number,
+        default: 0
     },
     freeSlab: {
-        type: Number
+        type: Number,
+        default: 0
     },
     bookedSlab: {
         type: Number,

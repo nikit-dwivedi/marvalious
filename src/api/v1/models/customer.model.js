@@ -32,7 +32,8 @@ const customerSchema = new Schema({
         type: String
     },
     isVerified: {
-        type: String
+        type: String,
+        default: false
     }
 }, { timestamps: true })
 const customerModel = mongoose.model('customer', customerSchema);

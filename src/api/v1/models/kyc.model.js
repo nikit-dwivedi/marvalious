@@ -13,15 +13,15 @@ const kycSchema = new Schema({
     address: {
         type: String
     },
-    aadharNumber: {
+    aadhaarNumber: {
         type: String,
         unique: true,
         required: true,
     },
-    aadharFront: {
+    aadhaarFront: {
         type: String,
     },
-    aadharBack: {
+    aadhaarBack: {
         type: String,
     },
     panNumber: {

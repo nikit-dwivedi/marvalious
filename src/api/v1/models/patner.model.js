@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 
-const patnerSchema = new Schema({
-    patnerId: {
+const partnerSchema = new Schema({
+    partnerId: {
         type: String,
         unique: true,
         required: true
@@ -11,19 +11,40 @@ const patnerSchema = new Schema({
         type: String,
         required: true
     },
-    slabSettingId: {
-        type: String,
-        required: true
+    slabInfo: {
+        slabSettingId: {
+            type: String,
+            required: true
+        },
+        amount: {
+            type: Number,
+            required: true
+        },
+        percent: {
+            type: Number,
+            required: true
+        },
+        interest: {
+            type: Number,
+            required: true,
+        },
+        locking: {
+            type: Number,
+            required: true
+        },
     },
     date: {
         type: String,
         required: true,
     },
+    expireDate: {
+        type: String
+    },
     isActive: {
         type: Boolean,
-        default: false
+        default: true
     }
 })
 
-const patnerModel = mongoose.model('patner', patnerSchema);
-module.exports = patnerModel
+const partnerModel = mongoose.model('partner', partnerSchema);
+module.exports = partnerModel

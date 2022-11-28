@@ -13,7 +13,7 @@ const bankSchema = new Schema({
     bankName: {
         type: String
     },
-    accountNumbe: {
+    accountNumber: {
         type: String
     },
     ifsc: {

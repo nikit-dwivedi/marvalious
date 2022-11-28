@@ -1,5 +1,6 @@
 const { randomBytes } = require('node:crypto');
 const { encryption } = require('../middlewares/authToken');
+const { responseFormater } = require('./response.format');
 
 module.exports = {
     authFormatter: async (phone) => {
@@ -32,16 +33,16 @@ module.exports = {
             profileImage: imageUrl
         }
     },
-    kycFormatter: (customId, kycData, imageData) => {
+    kycFormatter: (customId, kycData) => {
         return {
             customId: customId,
             name: kycData.name,
             address: kycData.address,
-            aadharNumber: kycData.aadharNumber,
-            aadharFront: imageData.aadharFront,
-            aadharback: imageData.aadharback,
+            aadhaarNumber: kycData.aadhaarNumber,
+            aadhaarFront: kycData.aadhaarFront,
+            aadhaarBack: kycData.aadhaarBack,
             panNumber: kycData.panNumber,
-            panFront: imageData.panFront
+            panFront: kycData.panFront
         }
     },
     bankFormatter: (customId, bankData) => {
@@ -50,21 +51,62 @@ module.exports = {
             customId: customId,
             bankId: bankId,
             bankName: bankData.bankName,
-            accountNumbe: bankData.accountNumbe,
+            accountNumber: bankData.accountNumber,
             ifsc: bankData.ifsc,
             accountHolderName: bankData.accountHolderName
         }
     },
+    nomineeFormatter: (customerId, nomineeData) => {
+        const { name, relation, aadhaarNo } = nomineeData
+        return { customerId, name, relation, aadhaarNo }
+    },
+    slabFormatter: (numberOfSlab, previousSlabData) => {
+        const totalSlab = previousSlabData ? previousSlabData.totalSlab + numberOfSlab : numberOfSlab
+        const freeSlab = previousSlabData ? previousSlabData.freeSlab + numberOfSlab : numberOfSlab
+        const bookedSlab = previousSlabData ? previousSlabData.bookedSlab : 0
+        return { totalSlab, freeSlab, bookedSlab }
+    },
     slabSettingFormatter: (slabData) => {
-        const slabSettingId = randomBytes(4).toString('hex')
-        let slot = 1 / ((slabData.persent * 1) / 100)
+        try {
+            const { amount, percent, interest, locking } = slabData
+            const slabSettingId = randomBytes(4).toString('hex')
+            let slot = 1 / ((percent * 1) / 100)
+            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, slot })
+        }
+        catch (error) {
+            return responseFormater(false, error.message)
+        }
+    },
+    partnerFormatter: (customId, rigData) => {
+        const partnerId = randomBytes(4).toString('hex')
         return {
-            slabSettingId: slabSettingId,
-            amount: slabData.amount,
-            persent: slabData.persent,
-            intrest: slabData.intrest,
-            locking: slabData.locking,
-            slot: slot
+            partnerId: partnerId,
+            customId: customId,
+            slabInfo: {
+                slabSettingId: rigData.slabSettingId,
+                amount: rigData.amount,
+                percent: rigData.percent,
+                interest: rigData.interest,
+                locking: rigData.locking,
+            },
+            date: dateFormatter(),
+            expireDate: dateFormatter(rigData.locking)
         }
     }
+}
+const dateFormatter = (locking = false) => {
+    const newDate = new Date
+    const date = newDate.getDate()
+    let month = newDate.getMonth() + 1
+    let year = newDate.getFullYear()
+    if (locking) {
+        if (locking + month > 12) {
+            let yearTotal = Math.floor((locking + month) / 12)
+            month = (locking + month) - 12
+            year += yearTotal
+        } else {
+            month += locking
+        }
+    }
+    return (`${date}-${month}-${year}`);
 }
