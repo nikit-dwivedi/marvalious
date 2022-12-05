@@ -63,7 +63,6 @@ exports.verifyOtp = async (reqId, otp) => {
     try {
         const newReqId = randomBytes(4).toString('hex')
         const userData = await authModel.findOne({ reqId });
-        console.log("reqId===>", newReqId);
         if (!userData) {
             return responseFormater(false, "invalid request id")
         }
@@ -72,8 +71,12 @@ exports.verifyOtp = async (reqId, otp) => {
         }
         const customId = await customerById(userData.userId)
         let token = ""
+        let name = ""
+        let profileImage = ""
         if (customId.status) {
             token = generateUserToken(customId.data)
+            name = customId.data.name
+            profileImage = customId.data.profileImage
         } else {
             token = generateUserToken(userData)
         }
@@ -81,7 +84,7 @@ exports.verifyOtp = async (reqId, otp) => {
         userData.otp = 0
         userData.reqId = newReqId
         await userData.save()
-        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded })
+        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded, name,profileImage })
     } catch (error) {
         console.log(error);
         return responseFormater(false, error.message)

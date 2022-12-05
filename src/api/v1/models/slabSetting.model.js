@@ -9,23 +9,27 @@ const slabSettingSchema = new Schema({
     },
     amount: {
         type: Number,
-        required: [true,"please provide amount"]
+        required: [true, "please provide amount"]
     },
     percent: {
         type: Number,
-        required: [true,"please provide percent"]
+        required: [true, "please provide percent"]
     },
     interest: {
         type: Number,
-        required: [true,"please provide interest"],
+        required: [true, "please provide interest"],
+    },
+    income: {
+        type: Number,
+        required: true
     },
     locking: {
         type: Number,
-        required: [true,"please provide locking"]
+        required: [true, "please provide locking"]
     },
     slot: {
         type: Number,
-        required: [true,"please provide slot"]
+        required: [true, "please provide slot"]
     }
 })
 
