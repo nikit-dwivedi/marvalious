@@ -5,7 +5,7 @@ const { addKyc, getKyc } = require("../helpers/kyc.helper");
 const { addNominee, getNominee, editNominee } = require("../helpers/nominee.helper");
 const { addPartner, getPartnerOfUser } = require("../helpers/partner.helper");
 const { unknownError, success, badRequest } = require("../helpers/response_helper");
-const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
+const { getSlabSettingById, changeSlabToBooked, getAllSlabSetting } = require("../helpers/slab.helper");
 const { parseJwt } = require("../middlewares/authToken");
 
 module.exports = {
@@ -124,7 +124,7 @@ module.exports = {
     },
     purchaseRig: async (req, res) => {
         try {
-            const { rigSettingId } = req.params
+            const { rigSettingId } = req.body
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
                 return badRequest(res, rigMessage)
@@ -146,6 +146,14 @@ module.exports = {
         try {
             const token = parseJwt(req.headers.authorization);
             const { status, message, data } = await getPartnerOfUser(token.customId)
+            return status ? success(res, message, data) : badRequest(res, message)
+        } catch (error) {
+            return unknownError(res, error.message)
+        }
+    },
+    allRigSetting: async (req, res) => {
+        try {
+            const { status, message, data } = await getAllSlabSetting()
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error.message)

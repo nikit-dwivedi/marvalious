@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser } = require('../controllers/customer.controller');
+const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser, allRigSetting } = require('../controllers/customer.controller');
 const { authenticateUser } = require('../middlewares/authToken');
 
 
@@ -15,7 +15,8 @@ router.post('/nominee', authenticateUser, addNomineeDetails);
 router.get('/nominee', authenticateUser, getNomineeDetails);
 router.post('/nominee/edit', authenticateUser, changeNomineeDetails);
 router.get('/rig/info/:rigSettingId', authenticateUser, getRifInfo);
-router.get('/rig/purchase/:rigSettingId', authenticateUser, purchaseRig);
+router.get('/rig/config', authenticateUser, allRigSetting);
+router.post('/rig/purchase', authenticateUser, purchaseRig);
 router.get('/rig/all', authenticateUser, getAllRigOfUser)
 
 module.exports = router;

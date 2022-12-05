@@ -37,11 +37,3 @@ exports.addRigSetting = async (req, res) => {
     }
 }
 
-exports.allRigSetting = async (req, res) => {
-    try {
-        const { status, message ,data} = await getAllSlabSetting()
-        return status ? success(res, message,data) : badRequest(res, message)
-    } catch (error) {
-        return unknownError(res, error.message)
-    }
-}
