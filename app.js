@@ -29,5 +29,6 @@ app.use('/v1', version1Index);
 
 app.all('*', async (req, res) => {
     await badRequest(res, 'Invalid URI');
+
 });
 module.exports = app;
