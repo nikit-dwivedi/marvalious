@@ -224,7 +224,6 @@ module.exports = {
                     panNumber: req.body.panNumber,
                     panFront: req.body.panFront
                 }
-                // console.log(kycData);
                 const customerId = token.customId
                 const nomineeCheck = await nomineeModel.findOne({ customerId })
                 if (nomineeCheck) {
@@ -235,16 +234,14 @@ module.exports = {
                         nomineeName: req.body.nomineeName,
                         nomineeRelation: req.body.nomineeRelation,
                         nomineeAadhaarNo: req.body.nomineeAadhaarNo
-                    }
-                    // console.log(nomineeData);
+                    }            
                     const formattedData = new kycModel(kycData)
-                    // console.log(formattedData);
                     await formattedData.save()
+                    const profileData = await customerModel.findOne(customerId)
+                    kycData.selfie = profileData.profileImage.save()
                     const formattedNomineeData = new nomineeModel(nomineeData)
-                    // console.log(formattedNomineeData);
                     await formattedNomineeData.save()
                     const data = { formattedData, formattedNomineeData }
-                    console.log(data);
                     data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
                 }
             }

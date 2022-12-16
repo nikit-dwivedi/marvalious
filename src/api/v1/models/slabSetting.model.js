@@ -31,7 +31,7 @@ const slabSettingSchema = new Schema({
         type: Number,
         required: [true, "please provide slot"]
     },
-    bookingPerCharge: {
+    slotBookingCharge: {
         type: Number,
         required: [true, "please provide booking charge"]
     }
