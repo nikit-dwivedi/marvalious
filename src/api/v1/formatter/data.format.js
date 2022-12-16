@@ -1,5 +1,6 @@
 const { randomBytes } = require('node:crypto');
 const { encryption } = require('../middlewares/authToken');
+const kycModel = require('../models/kyc.model');
 const { responseFormater } = require('./response.format');
 
 module.exports = {
@@ -20,8 +21,8 @@ module.exports = {
         return { adminId, phone, otp, reqId, date }
     },
     customerFormatter: (userId, phone, data) => {
-        const customerId = randomBytes(4).toString('hex')
-        const imageUrl = "image"
+        const image = kycModel.findOne({ customerId: customId })
+        const imageUrl  = image.selfie
         return {
             userId: userId,
             customerId: customerId,
@@ -37,12 +38,12 @@ module.exports = {
         return {
             customId: customId,
             name: kycData.name,
-            address: kycData.address,
             aadhaarNumber: kycData.aadhaarNumber,
             aadhaarFront: kycData.aadhaarFront,
             aadhaarBack: kycData.aadhaarBack,
             panNumber: kycData.panNumber,
-            panFront: kycData.panFront
+            panFront: kycData.panFront,
+
         }
     },
     bankFormatter: (customId, bankData) => {
@@ -57,8 +58,8 @@ module.exports = {
         }
     },
     nomineeFormatter: (customerId, nomineeData) => {
-        const { name, relation, aadhaarNo } = nomineeData
-        return { customerId, name, relation, aadhaarNo }
+        const { nomineeName, nomineeRelation, nomineeAadhaarNo } = nomineeData
+        return { customerId, nomineeName, nomineeRelation, nomineeAadhaarNo }
     },
     slabFormatter: (numberOfSlab, previousSlabData) => {
         const totalSlab = previousSlabData ? previousSlabData.totalSlab + numberOfSlab : numberOfSlab
@@ -68,11 +69,11 @@ module.exports = {
     },
     slabSettingFormatter: (slabData) => {
         try {
-            const { amount, percent, interest, locking } = slabData
+            const { amount, percent, interest, locking, bookingPerCharge } = slabData
             const slabSettingId = randomBytes(4).toString('hex')
             const income = (interest * amount) / 100
             let slot = 1 / ((percent * 1) / 100)
-            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot })
+            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, bookingPerCharge })
         }
         catch (error) {
             return responseFormater(false, error.message)

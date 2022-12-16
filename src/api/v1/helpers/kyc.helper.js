@@ -44,3 +44,5 @@ exports.getAllKyc = async () => {
         return responseFormater(false, error.message)
     }
 }
+
+

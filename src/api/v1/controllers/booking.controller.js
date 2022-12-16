@@ -1,39 +1,53 @@
 const { unknownError, success, badRequest, created } = require("../helpers/response_helper")
 const { parseJwt } = require("../middlewares/authToken");
-const bookingModel = require("../models/booking.model")
+const bookingModel = require("../models/booking.model");
+const slabSettingModel = require("../models/slabSetting.model");
+const bookingTransactionModel = require("../models/bookingTransaction.model")
+const { addRigSetting } = require("./admin.controller");
 
 
-
-const addBooking = async (req, res) => {
+const createBooking = async (req, res) => {
     try {
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const customId = token.customId
         const data = req.body
-        const bookingData = new bookingModel(data)
-        await bookingData.save()
-        return bookingData ? created(res, "booking added") : badRequest(res, "cannot added booking")
+        let index = {}
+        for (let rigId in data) {
+            const slabSettingId = rigId
+            const slot = data[rigId]
+            const rigDetails = await slabSettingModel.findOne({ slabSettingId })
+            const percent = rigDetails.percent
+            const totalAmount = rigDetails.bookingPerCharge * slot
+            data.slot = slot
+            data.percent = percent
+            data.totalAmount = totalAmount
+            data.customId = customId
+            data.rigId = rigId
+            index= new bookingModel(data)
+             await index.save()             
+
+        }
+        return index ? success(res, "booking is created") : badRequest(res, "booking not created")
     } catch (error) {
-        return badRequest("something went wrong")
+        console.log(error.message);
+        return badRequest(res, "something went wrong")
     }
 }
 
-
-const getBookings = async (req, res) => {
+const getBookingTransaction = async (req, res) => {
     try {
-        const data = await bookingModel.find()
-        data ? success(res, "here all the bookings", data) : badRequest(res, "cannot get bookings")
+        
     } catch (error) {
-        return badRequest("something went wrong")
-    }
-}
-
-const bookingById = async (req, res) => {
-    try {
-        const bookingId  = req.params.bookingId
-        const data = await bookingModel.findById( bookingId )
-        data ? success(res, "here is the booking", data) : badRequest(res, "cannot get bookings")
-    } catch (error) {
-        return badRequest("something went wrong")
+        
     }
 }
 
 
-module.exports = { addBooking, getBookings, bookingById }
+
+
+
+
+module.exports = {createBooking }

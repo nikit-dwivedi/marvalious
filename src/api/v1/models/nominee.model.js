@@ -5,13 +5,13 @@ const nomineeSchema = new Schema({
     customerId: {
         type: String
     },
-    name: {
+    nomineeName: {
         type: String
     },
-    relation: {
+    nomineeRelation: {
         type: String
     },
-    aadhaarNo: {
+    nomineeAadhaarNo: {
         type: String
     }
 })

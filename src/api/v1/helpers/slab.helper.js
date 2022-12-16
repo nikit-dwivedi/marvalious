@@ -33,7 +33,7 @@ exports.addSlabSetting = async (slabData) => {
             console.log(message);
             return responseFormater(false, message)
         }
-        const settingCheck = await slabSettingModel.findOne({ amount: data.amount, percent: data.percent, interest: data.interest, locking: data.locking })
+        const settingCheck = await slabSettingModel.findOne({ amount: data.amount, percent: data.percent, interest: data.interest, locking: data.locking, availableRigs: data.availableRigs })
         console.log("==========", data);
         if (settingCheck) {
             return responseFormater(false, "setting already exists ")

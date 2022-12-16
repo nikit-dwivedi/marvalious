@@ -7,6 +7,11 @@ const { addPartner, getPartnerOfUser } = require("../helpers/partner.helper");
 const { unknownError, success, badRequest } = require("../helpers/response_helper");
 const { getSlabSettingById, changeSlabToBooked, getAllSlabSetting } = require("../helpers/slab.helper");
 const { parseJwt } = require("../middlewares/authToken");
+const kycModel = require("../models/kyc.model")
+const { nomineeModel } = require("../models/nominee.model")
+const { responseFormater } = require('../formatter/response.format');
+const customerModel = require('../models/customer.model');
+const bankModel = require("../models/bank.model");
 
 module.exports = {
     onboard: async (req, res) => {
@@ -58,8 +63,8 @@ module.exports = {
             if (!token.customId) {
                 return badRequest(res, "please onboard first")
             }
-            const { status, message } = await addBank(token.customId, req.body)
-            return status ? success(res, message) : badRequest(res, message)
+            const { status, message, data } = await addBank(token.customId, req.body)
+            return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error.message)
         }
@@ -74,6 +79,43 @@ module.exports = {
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error.message)
+        }
+    },
+    editBankDetails: async (req, res) => {
+        try {
+            const token = parseJwt(req.headers.authorization)
+            if (!token.customId) {
+                return badRequest(res, "please onboard first")
+            }
+            const bankId = req.params.bankId
+            const bankData = await bankModel.findOne({ bankId })
+            if (bankData) {
+                const bankName = req.body.bankName
+                const accountNumber = req.body.accountNumber
+                const ifsc = req.body.ifsc
+                const accountHolderName = req.body.accountHolderName
+                const isActive = req.body.isActive
+                if (bankName) {
+                    bankData.bankName = bankName
+                } 
+                if (accountNumber) {
+                    bankData.accountNumber = accountNumber
+                } 
+                if (ifsc) {
+                    bankData.ifsc = ifsc
+                } 
+                if (accountHolderName) {
+                    bankData.accountHolderName = accountHolderName
+                }
+                if (isActive) {
+                    bankData.isActive = isActive
+                }
+                const bankDetails = await bankData.save()
+                bankDetails ? success(res, "bank details updated"): badRequest(res, "bank details cannot be edited")
+            }         
+        } catch (error) {
+            console.log(error.message);
+            return badRequest(res, "something went wrong")
         }
     },
     addNomineeDetails: async (req, res) => {
@@ -124,7 +166,7 @@ module.exports = {
     },
     purchaseRig: async (req, res) => {
         try {
-            const { rigSettingId } = req.body
+            const rigSettingId = req.params.rigSettingId
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
                 return badRequest(res, rigMessage)
@@ -158,5 +200,79 @@ module.exports = {
         } catch (error) {
             return unknownError(res, error.message)
         }
+    },
+
+    addKycAndNominee: async (req, res) => {
+        try {
+            const token = parseJwt(req.headers.authorization)
+            if (!token.customId) {
+                return badRequest(res, "please onboard first")
+            }
+            const customId = token.customId
+            const kycCheck = await kycModel.findOne({ customId })
+            if (kycCheck) {
+                return responseFormater(false, "Kyc already added")
+            } else {
+                const kycData = {
+                    customId: customId,
+                    name: req.body.name,
+                    occupation: req.body.occupation,
+                    selfie: req.body.selfie,
+                    aadhaarNumber: req.body.aadhaarNumber,
+                    aadhaarFront: req.body.aadhaarFront,
+                    aadhaarBack: req.body.aadhaarBack,
+                    panNumber: req.body.panNumber,
+                    panFront: req.body.panFront
+                }
+                // console.log(kycData);
+                const customerId = token.customId
+                const nomineeCheck = await nomineeModel.findOne({ customerId })
+                if (nomineeCheck) {
+                    return responseFormater(false, "Cannot add multiple nominee")
+                } else {
+                    const nomineeData = {
+                        customerId: customerId,
+                        nomineeName: req.body.nomineeName,
+                        nomineeRelation: req.body.nomineeRelation,
+                        nomineeAadhaarNo: req.body.nomineeAadhaarNo
+                    }
+                    // console.log(nomineeData);
+                    const formattedData = new kycModel(kycData)
+                    // console.log(formattedData);
+                    await formattedData.save()
+                    const formattedNomineeData = new nomineeModel(nomineeData)
+                    // console.log(formattedNomineeData);
+                    await formattedNomineeData.save()
+                    const data = { formattedData, formattedNomineeData }
+                    console.log(data);
+                    data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
+                }
+            }
+        } catch (error) {
+            console.log(error.message);
+            return badRequest(res, "something went wrong")
+        }
+    },
+
+    getKycAndNominee: async (req, res) => {
+        try {
+            const token = parseJwt(req.headers.authorization)
+            if (!token.customId) {
+                return badRequest(res, "please onboard first")
+            }
+            const customId = token.customId
+            const customerId = token.customId
+            const kycData = await kycModel.findOne({ customId })
+            const nomineeData = await nomineeModel.findOne({ customerId })
+            const data = {
+                kyc: kycData,
+                nominee: nomineeData
+            }
+            return data ? success(res, "here is the kyc and nominee details", data) : badRequest(res, "details not found")
+        } catch (error) {
+            return badRequest(res, "something went wrong")
+        }
     }
+
+
 }

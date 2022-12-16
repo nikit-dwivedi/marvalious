@@ -29,7 +29,8 @@ const customerSchema = new Schema({
         type: String
     },
     profileImage: {
-        type: String
+        type: String,
+        default:'https://res.cloudinary.com/djkxsdqmh/image/upload/v1671174943/kyc/avatar_vczkxl.svg'
     },
     isVerified: {
         type: String,

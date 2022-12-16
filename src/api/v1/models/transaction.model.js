@@ -2,24 +2,25 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema
 
 const transactionSchema = new Schema({
-    transactionId: {
-        type: String
-    },
+    // transactionId: {
+    //     type: String
+    // },
     customId: {
         type: String,
         required: true
     },
-    transactionType: {
+    type: {
         type: String,
-        enum: ['credit', 'debit']
+        enum: ['Credited', 'Invested']
     },
     amount: {
         type: String
     },
-    from: {
-        type: String
-    },
-    to: {
-        type: String
-    }
-})
+    Date: {
+        type: String,
+        // default: new Date().toLocaleDateString('en-IN')
+    }, 
+}, { timestamps: true })
+
+const transactionModel = mongoose.model('transaction', transactionSchema)
+module.exports = transactionModel

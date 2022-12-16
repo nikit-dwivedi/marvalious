@@ -106,7 +106,7 @@ async function onError(res, message, error) {
 };
 
 async function sendResponse(res, statusCode, status, message, error, items) {
-    res.status(200);
+    // res.status(200);
     res.json({
         status: status,
         subCode: statusCode,
