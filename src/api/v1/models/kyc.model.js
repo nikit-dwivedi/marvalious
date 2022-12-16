@@ -41,7 +41,7 @@ const kycSchema = new Schema({
     isVerified: {
         type: String,
         default: false
-    }
+    }, 
 }, { timestamps: true })
 
 const kycModel = mongoose.model('kyc', kycSchema);

@@ -21,9 +21,7 @@ module.exports = {
         return { adminId, phone, otp, reqId, date }
     },
     customerFormatter: (userId, phone, data) => {
-        const image = kycModel.findOne({ customerId: customId })
-        const imageUrl  = image.selfie
-        return {
+    return {
             userId: userId,
             customerId: customerId,
             name: data.name,
@@ -31,13 +29,15 @@ module.exports = {
             email: data.email,
             city: data.city,
             occupation: data.occupation,
-            profileImage: imageUrl
+            // profileImage: imageUrl
         }
     },
     kycFormatter: (customId, kycData) => {
         return {
             customId: customId,
             name: kycData.name,
+            occupation: kycData.occupation,
+            selfie:kycData.selfie,
             aadhaarNumber: kycData.aadhaarNumber,
             aadhaarFront: kycData.aadhaarFront,
             aadhaarBack: kycData.aadhaarBack,
