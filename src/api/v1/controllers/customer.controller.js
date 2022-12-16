@@ -210,9 +210,7 @@ module.exports = {
             }
             const customId = token.customId
             const kycCheck = await kycModel.findOne({ customId })
-            if (kycCheck) {
-                return responseFormater(false, "Kyc already added")
-            } else {
+            if (!kycCheck) {
                 const kycData = {
                     customId: customId,
                     name: req.body.name,
@@ -224,26 +222,25 @@ module.exports = {
                     panNumber: req.body.panNumber,
                     panFront: req.body.panFront
                 }
-                const customerId = token.customId
-                const nomineeCheck = await nomineeModel.findOne({ customerId })
-                if (nomineeCheck) {
-                    return responseFormater(false, "Cannot add multiple nominee")
-                } else {
+                console.log(kycData);     
                     const nomineeData = {
-                        customerId: customerId,
+                        customerId: customId,
                         nomineeName: req.body.nomineeName,
                         nomineeRelation: req.body.nomineeRelation,
                         nomineeAadhaarNo: req.body.nomineeAadhaarNo
                     }            
                     const formattedData = new kycModel(kycData)
                     await formattedData.save()
-                    const profileData = await customerModel.findOne(customerId)
-                    kycData.selfie = profileData.profileImage.save()
+                    // const profileData = await customerModel.findOne(customerId)
+                    // kycData.selfie = profileData.profileImage.save()
                     const formattedNomineeData = new nomineeModel(nomineeData)
                     await formattedNomineeData.save()
                     const data = { formattedData, formattedNomineeData }
-                    data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
-                }
+                    console.log(data);
+                    return data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
+                
+            } else {
+                badRequest(res, "kyc is already added")
             }
         } catch (error) {
             console.log(error.message);
