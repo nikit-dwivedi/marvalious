@@ -261,7 +261,11 @@ module.exports = {
                 kyc: kycData,
                 nominee: nomineeData
             }
-            return data ? success(res, "here is the kyc and nominee details", data) : badRequest(res, "details not found")
+            if (data.kyc && data.nominee) {
+                return success(res, "here is the kyc and nominee details", data)
+            } else {
+               return badRequest(res, "details not found")
+            }
         } catch (error) {
             return badRequest(res, "something went wrong")
         }
