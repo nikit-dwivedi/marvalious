@@ -97,13 +97,13 @@ module.exports = {
                 const isActive = req.body.isActive
                 if (bankName) {
                     bankData.bankName = bankName
-                } 
+                }
                 if (accountNumber) {
                     bankData.accountNumber = accountNumber
-                } 
+                }
                 if (ifsc) {
                     bankData.ifsc = ifsc
-                } 
+                }
                 if (accountHolderName) {
                     bankData.accountHolderName = accountHolderName
                 }
@@ -111,8 +111,8 @@ module.exports = {
                     bankData.isActive = isActive
                 }
                 const bankDetails = await bankData.save()
-                bankDetails ? success(res, "bank details updated"): badRequest(res, "bank details cannot be edited")
-            }         
+                bankDetails ? success(res, "bank details updated") : badRequest(res, "bank details cannot be edited")
+            }
         } catch (error) {
             console.log(error.message);
             return badRequest(res, "something went wrong")
@@ -222,28 +222,27 @@ module.exports = {
                     panNumber: req.body.panNumber,
                     panFront: req.body.panFront
                 }
-                console.log(kycData);     
-                    const nomineeData = {
-                        customerId: customId,
-                        nomineeName: req.body.nomineeName,
-                        nomineeRelation: req.body.nomineeRelation,
-                        nomineeAadhaarNo: req.body.nomineeAadhaarNo
-                    }            
-                    const formattedData = new kycModel(kycData)
-                    await formattedData.save()
-                    // const profileData = await customerModel.findOne(customerId)
-                    // kycData.selfie = profileData.profileImage.save()
-                    const formattedNomineeData = new nomineeModel(nomineeData)
-                    await formattedNomineeData.save()
-                    const data = { formattedData, formattedNomineeData }
-                    console.log(data);
-                    return data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
-                
+                //   console.log(kycData);     
+                const nomineeData = {
+                    customerId: customId,
+                    nomineeName: req.body.nomineeName,
+                    nomineeRelation: req.body.nomineeRelation,
+                    nomineeAadhaarNo: req.body.nomineeAadhaarNo
+                }
+                const formattedData = new kycModel(kycData)
+                await formattedData.save()
+                const customerId = token.customId
+                const profileImage = req.body.selfie
+                await customerModel.findOneAndUpdate({ customerId }, {profileImage})
+                const formattedNomineeData = new nomineeModel(nomineeData)
+                await formattedNomineeData.save()
+                const data = { formattedData, formattedNomineeData }
+                return data ? success(res, "kyc and nominee added") : badRequest(res, "kyc and nominee cannot be added")
             } else {
                 badRequest(res, "kyc is already added")
             }
         } catch (error) {
-            console.log(error.message);
+            console.log(error);
             return badRequest(res, "something went wrong")
         }
     },

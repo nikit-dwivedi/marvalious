@@ -10,9 +10,6 @@ const kycSchema = new Schema({
     name: {
         type: String
     },
-    // address: {
-    //     type: String
-    // },
     occupation: {
         type: String
     }, 
