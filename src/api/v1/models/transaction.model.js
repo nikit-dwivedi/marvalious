@@ -14,7 +14,7 @@ const transactionSchema = new Schema({
         enum: ['Credited', 'Invested']
     },
     amount: {
-        type: String
+        type: Number
     },
     Date: {
         type: String,

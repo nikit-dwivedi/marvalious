@@ -31,23 +31,46 @@ const createBooking = async (req, res) => {
             await index.save()
 
         }
-        return index ? success(res, "booking is created" , index) : badRequest(res, "booking not created")
+        return index ? success(res, "booking is created") : badRequest(res, "booking not created")
     } catch (error) {
         console.log(error.message);
         return badRequest(res, "something went wrong")
     }
 }
 
-const getBooking = async (req, res) => {
+const getAllSlots = async (req, res) => {
     try {
         const token = parseJwt(req.headers.authorization)
         if (!token.customId) {
             return badRequest(res, "please onboard first")
         }
-        const bookingData = await slabSettingModel.find().select('-_id -__v -interest -income -locking -amount')
-        return bookingData ? success(res, "here is rig details" , bookingData) : badRequest(res, "details not found")
+        const bookingData = await slabSettingModel.find().select('-_id -__v -interest -income -locking -amount -slot')
+        return bookingData ? success(res, "here is rig details", bookingData) : badRequest(res, "details not found")
     } catch (error) {
         badRequest(res, "something went wrong")
+    }
+}
+
+const bookingById = async (req, res) => {
+    try {
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const  customId = token.customId
+        const data = await bookingModel.findOne({customId})
+        return data ? success(res, "here is the bookings", data) : badRequest(res, "booking not found")
+    } catch (error) {
+        console.log(error.message);
+        return badRequest(res, "something went wrong")
+    }
+}
+const allBookings = async (req, res) => {
+    try {
+        const bookingData = await bookingModel.find()
+        return bookingData ? success(res, "here is all the bookings", bookingData) : badRequest(res, "booking not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
     }
 }
 
@@ -55,5 +78,4 @@ const getBooking = async (req, res) => {
 
 
 
-
-module.exports = { createBooking, getBooking }
+module.exports = { createBooking, getAllSlots, bookingById, allBookings }

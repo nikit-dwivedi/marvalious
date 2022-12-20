@@ -115,6 +115,7 @@ exports.addPartnershipByAdmin = async (req, res) => {
             const rigId = rigSettingId
             await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
         }
+        
         return success(res, message)
     } catch (error) {
         console.log(error.message);
