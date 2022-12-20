@@ -43,6 +43,10 @@ const partnerSchema = new Schema({
     isActive: {
         type: Boolean,
         default: true
+    },
+    profit: {
+        type: Number,
+        default: 0
     }
 })
 

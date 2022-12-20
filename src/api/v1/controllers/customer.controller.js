@@ -12,6 +12,8 @@ const { nomineeModel } = require("../models/nominee.model")
 const { responseFormater } = require('../formatter/response.format');
 const customerModel = require('../models/customer.model');
 const bankModel = require("../models/bank.model");
+const bookingModel = require("../models/booking.model");
+const transactionModel = require("../models/transaction.model")
 
 module.exports = {
     onboard: async (req, res) => {
@@ -173,11 +175,23 @@ module.exports = {
             }
             const token = parseJwt(req.headers.authorization)
             const { status, message } = await addPartner(token.customId, rigData)
+            // console.log(rigData);
             if (!status) {
                 return badRequest(res, message)
             }
             if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
                 await changeSlabToBooked()
+            }
+            if (addPartner) {
+                const rigId = rigSettingId
+                // const amount = rigData.amount 
+                const customId = token.customId
+                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                const transactionDetails = await transactionModel.findOne({ customId }) 
+                const totalAmount = rigData.amount
+                transactionDetails.amount += totalAmount
+                transactionDetails.save()
+
             }
             return success(res, message)
         } catch (error) {
@@ -233,7 +247,7 @@ module.exports = {
                 await formattedData.save()
                 const customerId = token.customId
                 const profileImage = req.body.selfie
-                await customerModel.findOneAndUpdate({ customerId }, {profileImage})
+                await customerModel.findOneAndUpdate({ customerId }, { profileImage })
                 const formattedNomineeData = new nomineeModel(nomineeData)
                 await formattedNomineeData.save()
                 const data = { formattedData, formattedNomineeData }
@@ -264,7 +278,7 @@ module.exports = {
             if (data.kyc && data.nominee) {
                 return success(res, "here is the kyc and nominee details", data)
             } else {
-               return badRequest(res, "details not found")
+                return badRequest(res, "details not found")
             }
         } catch (error) {
             return badRequest(res, "something went wrong")

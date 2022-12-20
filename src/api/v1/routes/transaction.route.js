@@ -8,9 +8,9 @@ const { authenticateUser } = require('../middlewares/authToken');
 
 
 
-router.post("/addtransaction", authenticateUser,addtransaction)
+router.post("/addtransaction", authenticateUser, addtransaction)
 router.get("/alltransaction", authenticateUser, allTransaction)
-router.get("/transactionById/:customId", authenticateUser,transactionById)
+router.get("/transactionById", authenticateUser, transactionById)
 
 
 

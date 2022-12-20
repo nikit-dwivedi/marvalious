@@ -69,11 +69,11 @@ module.exports = {
     },
     slabSettingFormatter: (slabData) => {
         try {
-            const { amount, percent, interest, locking, bookingPerCharge } = slabData
+            const { amount, percent, interest, locking, slotBookingCharge } = slabData
             const slabSettingId = randomBytes(4).toString('hex')
             const income = (interest * amount) / 100
             let slot = 1 / ((percent * 1) / 100)
-            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, bookingPerCharge })
+            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, slotBookingCharge })
         }
         catch (error) {
             return responseFormater(false, error.message)
