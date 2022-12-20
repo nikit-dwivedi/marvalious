@@ -22,12 +22,6 @@ module.exports = {
             const token = parseJwt(req.headers.authorization)
             const authData = await authByUserId(token.userId)
             const { status, message, data } = await onboardCustomer(token.userId, authData.phone, req.body);
-            const balanceData = {
-                customId: req.body.customId,
-                investAmount: req.body.investAmount,
-                profit : req.body.profit
-            }
-            new balanceModel(balanceData)
             return status ? success(res, message, data) : badRequest(res, message);
         } catch (error) {
             return unknownError(res, "unknown error")
@@ -198,6 +192,7 @@ module.exports = {
                 }
                 const transaction = new transactionModel(data)
                 await transaction.save()
+                const balanceDetails = await balanceModel
             }
             return success(res, message)
         } catch (error) {
