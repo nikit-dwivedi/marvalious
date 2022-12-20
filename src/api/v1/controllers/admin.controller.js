@@ -1,6 +1,13 @@
+const { getAllCustomer } = require("../helpers/customer.helper")
 const { success, badRequest, unknownError } = require("../helpers/response_helper")
-const { addSlab, getSlab, addSlabSetting, getAllSlabSetting } = require("../helpers/slab.helper")
+const { addSlab, getSlab, addSlabSetting } = require("../helpers/slab.helper")
+const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
+const { addPartner } = require("../helpers/partner.helper");
+const balanceModel = require('../models/balance.model')
+const customerModel = require("../models/customer.model")
 const slabSettingModel = require("../models/slabSetting.model")
+const bookingModel = require("../models/booking.model")
+const partnerModel = require("../models/patner.model")
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -51,7 +58,7 @@ exports.editRigSetting = async (req, res) => {
             const bookingPerCharge = req.body.bookingPerCharge
             if (amount) {
                 slabSettingData.amount = amount
-            } 
+            }
             if (percent) {
                 slabSettingData.percent = percent
             }
@@ -71,10 +78,70 @@ exports.editRigSetting = async (req, res) => {
                 slabSettingData.bookingPerCharge = bookingPerCharge
             }
             const rigData = await slabSettingData.save()
-            rigData ? success(res, "rig setting updated"): badRequest(res, "rig setting cannot be updated")
-        }   
+            rigData ? success(res, "rig setting updated") : badRequest(res, "rig setting cannot be updated")
+        }
     } catch (error) {
         console.log(error.message);
+        return badRequest(res, "something went wrong")
+    }
+}
+
+exports.getAllCustomer = async (req, res) => {
+    try {
+        const customerdata = await customerModel.find()
+        return customerdata ? success(res, "here are all the customers", customerdata) : badRequest(res, "customers not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
+
+exports.addPartnershipByAdmin = async (req, res) => {
+    try {
+        const rigSettingId = req.body.rigSettingId
+        const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
+        if (!rigStatus) {
+            return badRequest(res, rigMessage)
+        }
+        const customId = req.body.customId
+        const { status, message } = await addPartner(customId, rigData)
+        if (!status) {
+            return badRequest(res, message)
+        }
+        if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
+            await changeSlabToBooked()
+        }
+        if (addPartner) {
+            const rigId = rigSettingId
+            await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+        }
+        return success(res, message)
+    } catch (error) {
+        console.log(error.message);
+        return badRequest(res, "something went wrong")
+    }
+}
+
+
+exports.getBalanceById = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        
+        const partnerDetails = await partnerModel.findOneUpdate({ customId } , investAmount)
+        
+        await formattedData.save() ? success(res, "here is the balance") : badRequest(res, "balance not found")
+    } catch (error) {
+        console.log(error.message);
+        badRequest(res, "something went wrong")
+    }
+}
+
+
+exports.allBalance = async (req, res) => {
+    try {
+        const balanceDetails = await balanceModel.find()
+        return balanceDetails ? success(res, "here is the all balance", balanceDetails) : badRequest(res, "balance not found")
+    } catch (error) {
         return badRequest(res, "something went wrong")
     }
 }

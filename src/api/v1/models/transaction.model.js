@@ -18,7 +18,6 @@ const transactionSchema = new Schema({
     },
     Date: {
         type: String,
-        // default: new Date().toLocaleDateString('en-IN')
     }, 
 }, { timestamps: true })
 

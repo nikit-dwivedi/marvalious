@@ -17,7 +17,7 @@ async function notFound(res, message) {
 
 //send bad request response ----------------------------------------------------
 async function badRequest(res, message, error) {
-    sendResponse(res, 400, false, message, error, '');
+    sendResponse(res, 400, false, message, error, {});
 };
 
 //send unauthorized request response -------------------------------------------

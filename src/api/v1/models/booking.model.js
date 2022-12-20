@@ -23,15 +23,15 @@ const bookingSchema = new Schema({
         type: Number,
         required: true
     }, 
+    remainingAmount: {
+        type: Number,
+        required: true
+    },
     isPurchased: {
         type: Boolean,
         default: false
     },
-    remainingAmount: {
-        type: Number,
-        required: true
-    }
-
+    
     
 }, { timestamps: true })
 
