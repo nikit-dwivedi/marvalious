@@ -34,7 +34,7 @@ module.exports = {
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error)
-        }
+        }  
     },
     addKycDetails: async (req, res) => {
         try {
@@ -192,7 +192,6 @@ module.exports = {
                 }
                 const transaction = new transactionModel(data)
                 await transaction.save()
-                const balanceDetails = await balanceModel
             }
             return success(res, message)
         } catch (error) {
