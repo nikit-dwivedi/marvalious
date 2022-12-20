@@ -11,13 +11,13 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
         if (userCheck) {
             return { status: false, message: "customer already onboarded" }
         }
-       
-        const formattedData = customerFormatter(userId, phone, bodyData );
+
+        const formattedData = customerFormatter(userId, phone, bodyData);
         const token = generateUserToken(formattedData)
         const saveData = new customerModel(formattedData);
         await markUserOnboarded(userId);
         await saveData.save()
-        return responseFormater(true, "succesfully onboarded", { token })
+        return responseFormater(true, "succesfully onboarded", { token, profileImage: saveData.profileImage, name: saveData.name })
     } catch (error) {
         console.log(error);
         return { status: false, message: error.message }
