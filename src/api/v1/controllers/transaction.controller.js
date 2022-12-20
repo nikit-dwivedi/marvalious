@@ -52,6 +52,4 @@ const transactionById = async (req, res) => {
 
 
 
-
-
 module.exports = { addtransaction, allTransaction, transactionById }

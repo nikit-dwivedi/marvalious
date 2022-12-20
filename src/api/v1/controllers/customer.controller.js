@@ -13,7 +13,8 @@ const { responseFormater } = require('../formatter/response.format');
 const customerModel = require('../models/customer.model');
 const bankModel = require("../models/bank.model");
 const bookingModel = require("../models/booking.model");
-const transactionModel = require("../models/transaction.model")
+const transactionModel = require("../models/transaction.model");
+const balanceModel = require("../models/balance.model");
 
 module.exports = {
     onboard: async (req, res) => {
@@ -21,6 +22,12 @@ module.exports = {
             const token = parseJwt(req.headers.authorization)
             const authData = await authByUserId(token.userId)
             const { status, message, data } = await onboardCustomer(token.userId, authData.phone, req.body);
+            const balanceData = {
+                customId: req.body.customId,
+                investAmount: req.body.investAmount,
+                profit : req.body.profit
+            }
+            new balanceModel(balanceData)
             return status ? success(res, message, data) : badRequest(res, message);
         } catch (error) {
             return unknownError(res, "unknown error")
@@ -175,7 +182,6 @@ module.exports = {
             }
             const token = parseJwt(req.headers.authorization)
             const { status, message } = await addPartner(token.customId, rigData)
-            // console.log(rigData);
             if (!status) {
                 return badRequest(res, message)
             }
@@ -184,12 +190,14 @@ module.exports = {
             }
             if (addPartner) {
                 const rigId = rigSettingId
-                // const amount = rigData.amount 
-                const customId = token.customId
                 await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
-                const transactionDetails = await transactionModel.findOne({ customId }) 
-                transactionDetails.amount = rigData.amount
-                transactionDetails.save()
+                const data = {
+                    customId: token.customId,
+                    type: "Invested",
+                    amount: rigData.amount
+                }
+                const transaction = new transactionModel(data)
+                await transaction.save()
             }
             return success(res, message)
         } catch (error) {

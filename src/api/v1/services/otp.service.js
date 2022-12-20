@@ -29,7 +29,7 @@ const sendSms = async (number, otp) => {
         console.log(error)
     }
 }
-
+ 
 module.exports = { sendMail, sendSms }
 
 

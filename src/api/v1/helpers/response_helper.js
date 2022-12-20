@@ -12,22 +12,22 @@ async function created(res, message, items) {
 
 //send not found response ------------------------------------------------------
 async function notFound(res, message) {
-    sendResponse(res, 404, false, message, '', {});
+    sendResponse(res, 404, false, message, '' );
 };
 
 //send bad request response ----------------------------------------------------
 async function badRequest(res, message, error) {
-    sendResponse(res, 400, false, message, error, {});
+    sendResponse(res, 400, false, message, error);
 };
 
 //send unauthorized request response -------------------------------------------
 async function unauthorized(res, message) {
-    sendResponse(res, 401, false, message, '', {});
+    sendResponse(res, 401, false, message, '');
 };
 
 //send forbidden request response ----------------------------------------------
 async function forbidden(res, message) {
-    sendResponse(res, 403, false, message, '', {});
+    sendResponse(res, 403, false, message, '');
 };
 
 //send validation error response -----------------------------------------------
