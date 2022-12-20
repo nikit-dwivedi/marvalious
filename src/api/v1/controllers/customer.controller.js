@@ -188,10 +188,8 @@ module.exports = {
                 const customId = token.customId
                 await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
                 const transactionDetails = await transactionModel.findOne({ customId }) 
-                const totalAmount = rigData.amount
-                transactionDetails.amount += totalAmount
+                transactionDetails.amount = rigData.amount
                 transactionDetails.save()
-
             }
             return success(res, message)
         } catch (error) {

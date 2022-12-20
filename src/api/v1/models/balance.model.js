@@ -8,12 +8,12 @@ const balanceSchema = new Schema({
         required:true
     },
     investAmount: {
-        type: String,
+        type: Number,
         default: 0,
         required: true
     },
     profit: {
-        type: String,
+        type: Number,
         default: 0
     }, 
 }, { timestamps: true })
