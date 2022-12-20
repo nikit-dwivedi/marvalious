@@ -34,7 +34,7 @@ module.exports = {
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error)
-        }
+        }  
     },
     addKycDetails: async (req, res) => {
         try {
