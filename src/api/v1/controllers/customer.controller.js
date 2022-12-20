@@ -192,7 +192,6 @@ module.exports = {
                 }
                 const transaction = new transactionModel(data)
                 await transaction.save()
-                const balanceDetails = await balanceModel
             }
             return success(res, message)
         } catch (error) {

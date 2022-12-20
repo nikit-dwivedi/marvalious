@@ -15,7 +15,7 @@ exports.addBank = async (customId, bankData, imageData) => {
 exports.getBank = async (customId) => {
     try {
         const bankData = await bankModel.find({ customId }).select('-_id -isActive -__v');
-        return bankData ? responseFormater(true, "Bank detail", bankData) : responseFormater(false, "Bank not added")
+        return bankData[0] ? responseFormater(true, "Bank detail", bankData) : responseFormater(false, "Bank not added")
     } catch (error) {
         return responseFormater(false, error.message)
     }

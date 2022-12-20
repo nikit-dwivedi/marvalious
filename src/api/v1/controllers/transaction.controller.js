@@ -29,7 +29,7 @@ const addtransaction = async (req, res) => {
 const allTransaction = async (req, res) => {
     try {
         const data = await transactionModel.find().sort({amount:-1})
-        return data ? success(res, "here all the transcations" , data) : badRequest(res, "transaction not found")
+        return data[0] ? success(res, "here all the transcations" , data) : badRequest(res, "transaction not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }

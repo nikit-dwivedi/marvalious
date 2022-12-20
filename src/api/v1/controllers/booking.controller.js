@@ -45,7 +45,7 @@ const getAllSlots = async (req, res) => {
             return badRequest(res, "please onboard first")
         }
         const bookingData = await slabSettingModel.find().select('-_id -__v -interest -income -locking -amount -slot')
-        return bookingData ? success(res, "here is rig details", bookingData) : badRequest(res, "details not found")
+        return bookingData[0] ? success(res, "here is rig details", bookingData) : badRequest(res, "details not found")
     } catch (error) {
         badRequest(res, "something went wrong")
     }
@@ -75,9 +75,22 @@ const allBookings = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+const allBookingUser = async (req, res) => {
+    try {
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const customId = token.customId
+        const bookingData = await bookingModel.find({customId})
+        return bookingData[0] ? success(res, "here is all the bookings", bookingData) : badRequest(res, "booking not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
 
 
 
 
 
-module.exports = { createBooking, getAllSlots, bookingById, allBookings }
+module.exports = { createBooking, getAllSlots, bookingById, allBookings, allBookingUser }
