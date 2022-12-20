@@ -20,8 +20,9 @@ module.exports = {
         const date = d.getDate()
         return { adminId, phone, otp, reqId, date }
     },
-    customerFormatter: (userId, phone, data) => {
-    return {
+    customerFormatter: (userId, phone, data, customId) => {
+        const customerId = randomBytes(4).toString('hex')
+        return {
             userId: userId,
             customerId: customerId,
             name: data.name,
@@ -37,7 +38,7 @@ module.exports = {
             customId: customId,
             name: kycData.name,
             occupation: kycData.occupation,
-            selfie:kycData.selfie,
+            selfie: kycData.selfie,
             aadhaarNumber: kycData.aadhaarNumber,
             aadhaarFront: kycData.aadhaarFront,
             aadhaarBack: kycData.aadhaarBack,

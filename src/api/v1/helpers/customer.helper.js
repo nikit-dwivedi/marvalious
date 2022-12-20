@@ -1,6 +1,6 @@
 const { customerFormatter } = require('../formatter/data.format');
 const { responseFormater } = require('../formatter/response.format');
-const { generateUserToken } = require('../middlewares/authToken');
+const { generateUserToken, parseJwt } = require('../middlewares/authToken');
 const authModel = require('../models/auth.model');
 const customerModel = require('../models/customer.model');
 
@@ -11,14 +11,15 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
         if (userCheck) {
             return { status: false, message: "customer already onboarded" }
         }
-        const formattedData = customerFormatter(userId, phone, bodyData);
+       
+        const formattedData = customerFormatter(userId, phone, bodyData );
         const token = generateUserToken(formattedData)
         const saveData = new customerModel(formattedData);
         await markUserOnboarded(userId);
         await saveData.save()
         return responseFormater(true, "succesfully onboarded", { token })
     } catch (error) {
-        console.log("=========helper", error);
+        console.log(error);
         return { status: false, message: error.message }
     }
 }
