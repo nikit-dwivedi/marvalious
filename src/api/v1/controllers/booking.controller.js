@@ -65,6 +65,8 @@ const bookingById = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+
+
 const allBookings = async (req, res) => {
     try {
         const bookingData = await bookingModel.find()

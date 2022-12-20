@@ -8,7 +8,7 @@ const customerModel = require("../models/customer.model")
 const slabSettingModel = require("../models/slabSetting.model")
 const bookingModel = require("../models/booking.model")
 const partnerModel = require("../models/patner.model");
-const res = require("express/lib/response");
+const transactionModel = require('../models/transaction.model')
 const kycModel = require("../models/kyc.model");
 
 exports.registerAdmin = async (req, res) => {
@@ -136,31 +136,36 @@ exports.editKycVerified = async (req, res) => {
     try {
         const customId = req.params.customId
         const kycData = await kycModel.findOne({ customId })
-        console.log(kycData);
         if (kycData) {
             const isVerified = req.body.isVerified
             if (isVerified) {
-                kycData.isVerified = isVerified               
+                kycData.isVerified = isVerified
             }
             const formattedKyc = await kycData.save()
-            return formattedKyc? success(res, "kyc is verified"): badRequest(res, "kyc cannot be verified")
+            return formattedKyc ? success(res, "kyc is verified") : badRequest(res, "kyc cannot be verified")
         } else {
             return badRequest(res, "kyc not found")
         }
     } catch (error) {
-          return badRequest(res, "something went wrong")
+        return badRequest(res, "something went wrong")
     }
 }
 
 exports.getAllKyc = async (req, res) => {
     try {
-        
+        let isVerified = req.body.isVerified
+        if (isVerified == "true") {
+            const kycDetails = await kycModel.find({ isVerified: true })
+            return kycDetails ? success(res, "here is the kyc details", kycDetails) : badRequest(res, "kyc details not found")
+        } else {
+            const kycData = await kycModel.find({ isVerified: false })
+            return kycData ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc details not found")
+        }
     } catch (error) {
-        
+        console.log(error.message);
+        return badRequest(res, "something went  wrong")
     }
 }
-
-
 
 exports.getBalanceById = async (req, res) => {
     try {
