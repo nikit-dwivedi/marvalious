@@ -7,7 +7,9 @@ const balanceModel = require('../models/balance.model')
 const customerModel = require("../models/customer.model")
 const slabSettingModel = require("../models/slabSetting.model")
 const bookingModel = require("../models/booking.model")
-const partnerModel = require("../models/patner.model")
+const partnerModel = require("../models/patner.model");
+const res = require("express/lib/response");
+const kycModel = require("../models/kyc.model");
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -44,6 +46,7 @@ exports.addRigSetting = async (req, res) => {
         return unknownError(res, error.message)
     }
 }
+
 exports.editRigSetting = async (req, res) => {
     try {
         const slabSettingId = req.params.slabSettingId
@@ -114,8 +117,14 @@ exports.addPartnershipByAdmin = async (req, res) => {
         if (addPartner) {
             const rigId = rigSettingId
             await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+            const data = {
+                customId: token.customId,
+                type: "Invested",
+                amount: rigData.amount
+            }
+            const transaction = new transactionModel(data)
+            await transaction.save()
         }
-        
         return success(res, message)
     } catch (error) {
         console.log(error.message);
@@ -123,14 +132,41 @@ exports.addPartnershipByAdmin = async (req, res) => {
     }
 }
 
+exports.editKycVerified = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const kycData = await kycModel.findOne({ customId })
+        console.log(kycData);
+        if (kycData) {
+            const isVerified = req.body.isVerified
+            if (isVerified) {
+                kycData.isVerified = isVerified               
+            }
+            const formattedKyc = await kycData.save()
+            return formattedKyc? success(res, "kyc is verified"): badRequest(res, "kyc cannot be verified")
+        } else {
+            return badRequest(res, "kyc not found")
+        }
+    } catch (error) {
+          return badRequest(res, "something went wrong")
+    }
+}
+
+exports.getAllKyc = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        
+    }
+}
+
+
 
 exports.getBalanceById = async (req, res) => {
     try {
         const customId = req.params.customId
-        
-        const partnerDetails = await partnerModel.findOneUpdate({ customId } , investAmount)
-        
-        await formattedData.save() ? success(res, "here is the balance") : badRequest(res, "balance not found")
+        const balanceDetails = await balanceModel.findOneUpdate({ customId })
+        await balanceDetails ? success(res, "here is the balance") : badRequest(res, "balance not found")
     } catch (error) {
         console.log(error.message);
         badRequest(res, "something went wrong")

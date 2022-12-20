@@ -56,9 +56,9 @@ exports.genrateOtpPhone = async (phone) => {
     updatedData.date = date.getDate();
     await updatedData.save()
     await sendSms(phone, otp)
-
     return responseFormater(true, "otp sent to phone", { reqId: reqId, isOnboarded: updatedData.isOnboarded })
 }
+
 exports.verifyOtp = async (reqId, otp) => {
     try {
         const newReqId = randomBytes(4).toString('hex')
@@ -84,7 +84,7 @@ exports.verifyOtp = async (reqId, otp) => {
         userData.otp = 0
         userData.reqId = newReqId
         await userData.save()
-        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded, name,profileImage })
+        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded, name, profileImage })
     } catch (error) {
         console.log(error);
         return responseFormater(false, error.message)

@@ -7,7 +7,7 @@ const { authenticateUser } = require('../middlewares/authToken');
 
 
 router.post('/createBooking', authenticateUser, createBooking)
-router.get('/getDetails', authenticateUser, getAllSlots)
+router.get('/getAllSlots', authenticateUser, getAllSlots)
 router.get('/bookingById', authenticateUser, bookingById)
 router.get('/allBookings', authenticateUser, allBookings )
 
