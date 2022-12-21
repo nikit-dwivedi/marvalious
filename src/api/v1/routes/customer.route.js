@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
+
 const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser, allRigSetting, addKycAndNominee, getKycAndNominee, editBankDetails } = require('../controllers/customer.controller');
 const { authenticateUser } = require('../middlewares/authToken');
+const { getBalanceUser } = require('../controllers/admin.controller')
 
 
 router.post('/onboard', authenticateUser, onboard);
@@ -21,5 +23,7 @@ router.post('/rig/purchase/:rigSettingId', authenticateUser, purchaseRig);
 router.get('/rig/all', authenticateUser, getAllRigOfUser)
 router.post('/kyc/nominee', authenticateUser, addKycAndNominee)
 router.get('/kycinfo/nomineeinfo', authenticateUser, getKycAndNominee)
+router.get('/allBalance', authenticateUser, getBalanceUser)
+
 
 module.exports = router;
