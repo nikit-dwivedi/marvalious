@@ -43,7 +43,7 @@ const transactionById = async (req, res) => {
             return badRequest(res, "please onboard first")
         }
         const customId = token.customId
-        const data = await transactionModel.findOne(customId)
+        const data = await transactionModel.findOne({ customId }).sort({ timestamps:-1})
         return data ? success(res, "here are the transaction", data) : badRequest(res, "transaction not found")
     } catch (error) {
         return badRequest(res, "something went wrong")

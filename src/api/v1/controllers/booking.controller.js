@@ -51,20 +51,20 @@ const getAllSlots = async (req, res) => {
     }
 }
 
-const bookingById = async (req, res) => {
-    try {
-        const token = parseJwt(req.headers.authorization)
-        if (!token.customId) {
-            return badRequest(res, "please onboard first")
-        }
-        const  customId = token.customId
-        const data = await bookingModel.findOne({customId})
-        return data ? success(res, "here is the bookings", data) : badRequest(res, "booking not found")
-    } catch (error) {
-        console.log(error.message);
-        return badRequest(res, "something went wrong")
-    }
-}
+// const bookingById = async (req, res) => {
+//     try {
+//         const token = parseJwt(req.headers.authorization)
+//         if (!token.customId) {
+//             return badRequest(res, "please onboard first")
+//         }
+//         const  customId = token.customId
+//         const data = await bookingModel.findOne({customId})
+//         return data ? success(res, "here is the bookings", data) : badRequest(res, "booking not found")
+//     } catch (error) {
+//         console.log(error.message);
+//         return badRequest(res, "something went wrong")
+//     }
+// }
 
 
 const allBookings = async (req, res) => {
@@ -93,4 +93,4 @@ const allBookingUser = async (req, res) => {
 
 
 
-module.exports = { createBooking, getAllSlots, bookingById, allBookings, allBookingUser }
+module.exports = { createBooking, getAllSlots, allBookings, allBookingUser }

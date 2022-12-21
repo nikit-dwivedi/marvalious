@@ -3,6 +3,7 @@ const { responseFormater } = require('../formatter/response.format');
 const { generateUserToken, parseJwt } = require('../middlewares/authToken');
 const authModel = require('../models/auth.model');
 const customerModel = require('../models/customer.model');
+const balanceModel = require('../models/balance.model')
 
 
 exports.onboardCustomer = async (userId, phone, bodyData) => {
@@ -17,6 +18,13 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
         const saveData = new customerModel(formattedData);
         await markUserOnboarded(userId);
         await saveData.save()
+
+        const balanceData = {
+            customId: formattedData.customerId,
+            investAmount: 0,
+            profit: 0
+        }
+        await new balanceModel(balanceData).save()
         return responseFormater(true, "succesfully onboarded", { token, profileImage: saveData.profileImage, name: saveData.name })
     } catch (error) {
         console.log(error);

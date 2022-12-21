@@ -92,7 +92,7 @@ exports.editRigSetting = async (req, res) => {
 exports.getAllCustomer = async (req, res) => {
     try {
         const customerdata = await customerModel.find()
-        return customerdata ? success(res, "here are all the customers", customerdata) : badRequest(res, "customers not found")
+        return customerdata[0] ? success(res, "here are all the customers", customerdata) : badRequest(res, "customers not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
@@ -170,8 +170,8 @@ exports.getAllKyc = async (req, res) => {
 exports.getBalanceById = async (req, res) => {
     try {
         const customId = req.params.customId
-        const balanceDetails = await balanceModel.findOneUpdate({ customId })
-        await balanceDetails ? success(res, "here is the balance") : badRequest(res, "balance not found")
+        const balanceDetails = await balanceModel.findOne({ customId })
+        return balanceDetails ? success(res, "here is the balance") : badRequest(res, "balance not found")
     } catch (error) {
         console.log(error.message);
         badRequest(res, "something went wrong")
@@ -182,7 +182,7 @@ exports.getBalanceById = async (req, res) => {
 exports.allBalance = async (req, res) => {
     try {
         const balanceDetails = await balanceModel.find()
-        return balanceDetails ? success(res, "here is the all balance", balanceDetails) : badRequest(res, "balance not found")
+        return balanceDetails[0] ? success(res, "here is the all balance", balanceDetails) : badRequest(res, "balance not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }

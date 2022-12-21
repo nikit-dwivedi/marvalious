@@ -21,7 +21,7 @@ exports.addSlab = async (numberOfRig) => {
 exports.getSlab = async () => {
     try {
         const slabData = await slabModel.findOne().select("-_id -__v")
-        return slabData ? responseFormater(true, "slab detail", slabData) : responseFormater(false, "slab not completed")
+        return slabData[0] ? responseFormater(true, "slab detail", slabData) : responseFormater(false, "slab not completed")
     } catch (error) {
         return responseFormater(false, error.message)
     }
