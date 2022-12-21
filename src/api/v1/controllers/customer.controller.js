@@ -34,7 +34,7 @@ module.exports = {
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error)
-        }  
+        }
     },
     addKycDetails: async (req, res) => {
         try {
@@ -184,6 +184,11 @@ module.exports = {
             }
             if (addPartner) {
                 const rigId = rigSettingId
+                const balanceData = await balanceModel.findOne({ customId: token.customId })
+                if (balanceData) {
+                    balanceData.investAmount = balanceData.investAmount + rigData.amount
+                     await new balanceModel(balanceData).save()
+                 }
                 await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
                 const data = {
                     customId: token.customId,
