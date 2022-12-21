@@ -2,6 +2,7 @@ const { getAllCustomer } = require("../helpers/customer.helper")
 const { success, badRequest, unknownError } = require("../helpers/response_helper")
 const { addSlab, getSlab, addSlabSetting } = require("../helpers/slab.helper")
 const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
+const { parseJwt } = require("../middlewares/authToken");
 const { addPartner } = require("../helpers/partner.helper");
 const balanceModel = require('../models/balance.model')
 const customerModel = require("../models/customer.model")
@@ -167,11 +168,15 @@ exports.getAllKyc = async (req, res) => {
     }
 }
 
-exports.getBalanceById = async (req, res) => {
+exports.getBalanceUser = async (req, res) => {
     try {
-        const customId = req.params.customId
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const customId = token.customId
         const balanceDetails = await balanceModel.findOne({ customId })
-        return balanceDetails ? success(res, "here is the balance") : badRequest(res, "balance not found")
+        return balanceDetails[0] ? success(res, "here is the balance") : badRequest(res, "balance not found")
     } catch (error) {
         console.log(error.message);
         badRequest(res, "something went wrong")
