@@ -113,7 +113,7 @@ async function sendResponse(res, statusCode, status, message, error, items) {
         message: message,
         error: error,
         items: items
-    });
+    }); 
 }
 
 
