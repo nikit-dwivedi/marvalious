@@ -4,6 +4,10 @@ const { responseFormater } = require("../formatter/response.format");
 
 exports.addBank = async (customId, bankData, imageData) => {
     try {
+        const bankCheck = await bankModel.findOne({ customId: customId })
+        if (bankCheck) {
+            return { status: false, message: "cannot add multiple bank" }
+        }
         const formattedData = bankFormatter(customId, bankData, imageData);
         const saveData = new bankModel(formattedData)
         await saveData.save()
