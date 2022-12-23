@@ -86,6 +86,7 @@ module.exports = {
     },
     editBankDetails: async (req, res) => {
         try {
+            console.log("=======");
             const token = parseJwt(req.headers.authorization)
             if (!token.customId) {
                 return badRequest(res, "please onboard first")
@@ -98,6 +99,7 @@ module.exports = {
                 const ifsc = req.body.ifsc
                 const accountHolderName = req.body.accountHolderName
                 const isActive = req.body.isActive
+                const upiId = req.body.upiId
                 if (bankName) {
                     bankData.bankName = bankName
                 }
@@ -112,9 +114,11 @@ module.exports = {
                 }
                 if (isActive) {
                     bankData.isActive = isActive
+                } if (upiId) {
+                    bankData.upiId = upiId
                 }
                 const bankDetails = await bankData.save()
-                bankDetails ? success(res, "bank details updated") : badRequest(res, "bank details cannot be edited")
+                return bankDetails ? success(res, "bank details updated", bankDetails) : badRequest(res, "bank details cannot be edited")
             }
         } catch (error) {
             console.log(error.message);
