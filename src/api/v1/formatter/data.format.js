@@ -55,7 +55,8 @@ module.exports = {
             bankName: bankData.bankName,
             accountNumber: bankData.accountNumber,
             ifsc: bankData.ifsc,
-            accountHolderName: bankData.accountHolderName
+            accountHolderName: bankData.accountHolderName,
+            upiId:bankData.upiId
         }
     },
     nomineeFormatter: (customerId, nomineeData) => {

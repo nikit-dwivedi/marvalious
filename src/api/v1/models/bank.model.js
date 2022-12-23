@@ -22,6 +22,9 @@ const bankSchema = new Schema({
     accountHolderName: {
         type: String
     },
+    upiId: {
+        type: String
+    },
     isActive: {
         type: Boolean,
         default: true

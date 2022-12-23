@@ -1,4 +1,4 @@
-const { unknownError, success, badRequest, created } = require("../helpers/response_helper")
+const {success, badRequest } = require("../helpers/response_helper")
 const { parseJwt } = require("../middlewares/authToken");
 const bookingModel = require("../models/booking.model");
 const slabSettingModel = require("../models/slabSetting.model");
