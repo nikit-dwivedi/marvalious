@@ -187,7 +187,7 @@ exports.getBalanceUser = async (req, res) => {
 exports.allBalance = async (req, res) => {
     try {
         const balanceDetails = await balanceModel.find()
-        return balanceDetails[0] ? success(res, "here is the all balance", balanceDetails) : badRequest(res, "balance not found")
+        return balanceDetails[0] ? success(res, "balance details", balanceDetails) : badRequest(res, "balance not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }

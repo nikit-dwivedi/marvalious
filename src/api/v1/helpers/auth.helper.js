@@ -49,7 +49,7 @@ exports.genrateOtpPhone = async (phone) => {
     const updatedData = await authModel.findOne({ phone })
     if (updatedData.noOfOtp >= 10 && updatedData.date == date.getDate()) {
         return responseFormater(false, "otp limit reached. try again tomorrow", {})
-    }
+    }   
     updatedData.otp = otp;
     updatedData.reqId = reqId;
     updatedData.noOfOtp += 1
