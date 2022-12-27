@@ -225,3 +225,15 @@ exports.editBalance = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+
+
+exports.getKycById = async (req, res) => {
+  try {
+      const customId = req.params.customId
+      const kycData = await kycModel.findOne({customId})
+      return kycData ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc cannot found")
+  } catch (error) {
+      console.log(error.message);
+    return badRequest(res, "something went wrong")
+  }
+}
