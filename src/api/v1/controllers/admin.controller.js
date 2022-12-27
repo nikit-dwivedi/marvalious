@@ -48,6 +48,15 @@ exports.addRigSetting = async (req, res) => {
     }
 }
 
+exports.getAllRigSetting = async (req, res) => {
+    try {
+        const rigData = await slabSettingModel.find()
+        return rigData[0] ? success(res, "here is the rig settings", rigData) : badRequest(res, "rig setting not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
 exports.editRigSetting = async (req, res) => {
     try {
         const slabSettingId = req.params.slabSettingId
@@ -139,11 +148,15 @@ exports.editKycVerified = async (req, res) => {
         const kycData = await kycModel.findOne({ customId })
         if (kycData) {
             const isVerified = req.body.isVerified
-            if (isVerified) {
+            if (isVerified == true) {
                 kycData.isVerified = isVerified
+                const formattedKyc = await kycData.save()
+                return success(res, "kyc is verified")
+            } else {
+                kycData.isVerified = isVerified
+                const formattedKyc = await kycData.save()
+                return success(res, "kyc is rejected")
             }
-            const formattedKyc = await kycData.save()
-            return formattedKyc ? success(res, "kyc is verified") : badRequest(res, "kyc cannot be verified")
         } else {
             return badRequest(res, "kyc not found")
         }
@@ -155,12 +168,13 @@ exports.editKycVerified = async (req, res) => {
 exports.getAllKyc = async (req, res) => {
     try {
         let isVerified = req.body.isVerified
-        if (isVerified == "true") {
+
+        if (isVerified == true) {
             const kycDetails = await kycModel.find({ isVerified: true })
-            return kycDetails ? success(res, "here is the kyc details", kycDetails) : badRequest(res, "kyc details not found")
+            return kycDetails[0] ? success(res, "here is the kyc details", kycDetails) : badRequest(res, "kyc details not found")
         } else {
             const kycData = await kycModel.find({ isVerified: false })
-            return kycData ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc details not found")
+            return kycData[0] ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc details not found")
         }
     } catch (error) {
         console.log(error.message);
@@ -170,13 +184,9 @@ exports.getAllKyc = async (req, res) => {
 
 exports.getBalanceUser = async (req, res) => {
     try {
-        const token = parseJwt(req.headers.authorization)
-        if (!token.customId) {
-            return badRequest(res, "please onboard first")
-        }
-        const customId = token.customId
+        const customId = req.params.customId
         const balanceDetails = await balanceModel.findOne({ customId })
-        return balanceDetails[0] ? success(res, "here is the balance") : badRequest(res, "balance not found")
+        return balanceDetails ? success(res, "here is the balance", balanceDetails) : badRequest(res, "balance not found")
     } catch (error) {
         console.log(error.message);
         badRequest(res, "something went wrong")
@@ -188,6 +198,29 @@ exports.allBalance = async (req, res) => {
     try {
         const balanceDetails = await balanceModel.find()
         return balanceDetails[0] ? success(res, "balance details", balanceDetails) : badRequest(res, "balance not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
+
+exports.editBalance = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const balanceData = await balanceModel.findOne({ customId })
+        if (balanceData) {
+            const investAmount = req.body.investAmount
+            const profit = req.body.profit
+            if (investAmount) {
+                balanceData.investAmount = investAmount
+            } 
+            if (profit) {
+               balanceData.profit = profit
+            }
+            const editBalance = new balanceModel(balanceData)
+            const saveBalance = editBalance.save()
+            return saveBalance ? success(res, "balance edited"):badRequest(res, "balance cannot be edited")
+        }
     } catch (error) {
         return badRequest(res, "something went wrong")
     }

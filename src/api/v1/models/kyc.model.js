@@ -36,7 +36,7 @@ const kycSchema = new Schema({
         type: String
     },
     isVerified: {
-        type: String,
+        type: Boolean,
         default: false
     }, 
 }, { timestamps: true })

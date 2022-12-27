@@ -30,12 +30,13 @@ const customerSchema = new Schema({
     },
     profileImage: {
         type: String,
-        default:'https://res.cloudinary.com/djkxsdqmh/image/upload/v1671174943/kyc/avatar_vczkxl.svg'
+        default: 'https://res.cloudinary.com/djkxsdqmh/image/upload/v1671174943/kyc/avatar_vczkxl.svg'
     },
     isVerified: {
-        type: String,
+        type: Boolean,
         default: false
     }
 }, { timestamps: true })
+
 const customerModel = mongoose.model('customer', customerSchema);
 module.exports = customerModel;

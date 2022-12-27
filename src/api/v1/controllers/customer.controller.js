@@ -292,7 +292,21 @@ module.exports = {
         } catch (error) {
             return badRequest(res, "something went wrong")
         }
-    }
+    },
 
+    getBalanceUser: async (req, res) => {
+        try {
+            const token = parseJwt(req.headers.authorization)
+            if (!token.customId) {
+                return badRequest(res, "please onboard first")
+            }
+            const customId = token.customId
+            const balanceDetails = await balanceModel.findOne({ customId })
+            return balanceDetails ? success(res, "here is the balance", balanceDetails) : badRequest(res, "balance not found")
+        } catch (error) {
+            console.log(error.message);
+            badRequest(res, "something went wrong")
+        }
+    }
 
 }
