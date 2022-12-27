@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc } = require('../controllers/admin.controller');
+const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById } = require('../controllers/admin.controller');
 const router = express.Router();
 
 
@@ -15,4 +15,5 @@ router.get('/getAllBalance', allBalance)
 router.post('/editBalance/:customId', editBalance)
 router.post('/editKycVerified/:customId', editKycVerified)
 router.post('/getAllKyc', getAllKyc)
+router.get('/getKyc/:customId', getKycById)
 module.exports = router 
