@@ -25,7 +25,7 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
             profit: 0
         }
         await new balanceModel(balanceData).save()
-        return responseFormater(true, "succesfully onboarded", { token, profileImage: saveData.profileImage, name: saveData.name })
+        return responseFormater(true, "succesfully onboarded", { token, profileImage: saveData.profileImage, name: saveData.name , occupation: saveData.occupation })
     } catch (error) {
         console.log(error);
         return { status: false, message: error.message }
