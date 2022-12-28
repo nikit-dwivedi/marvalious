@@ -11,6 +11,7 @@ const bookingModel = require("../models/booking.model")
 const partnerModel = require("../models/patner.model");
 const transactionModel = require('../models/transaction.model')
 const kycModel = require("../models/kyc.model");
+const bankModel = require("../models/bank.model");
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -231,7 +232,26 @@ exports.getKycById = async (req, res) => {
       const kycData = await kycModel.findOne({customId})
       return kycData ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc cannot found")
   } catch (error) {
-      console.log(error.message);
     return badRequest(res, "something went wrong")
   }
+}
+
+exports.getBankById = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const bankData = await bankModel.findOne({ customId })
+        return bankData ? success(res, "here is the bank details", bankData): badRequest(res, "bank details cannot found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
+exports.getCustomerById = async (req, res) => {
+    try {
+        const customerId = req.params.customerId
+        const customerData = await customerModel.findOne({ customerId })
+        return customerData ? success(res, "here is the customer details", customerData): badRequest(res, "customer details cannot found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
 }
