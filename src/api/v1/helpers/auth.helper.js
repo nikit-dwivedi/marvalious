@@ -73,10 +73,12 @@ exports.verifyOtp = async (reqId, otp) => {
         let token = ""
         let name = ""
         let profileImage = ""
+        let occupation = ""
         if (customId.status) {
             token = generateUserToken(customId.data)
             name = customId.data.name
             profileImage = customId.data.profileImage
+            occupation = customId.data.occupation
         } else {
             token = generateUserToken(userData)
         }
@@ -84,7 +86,7 @@ exports.verifyOtp = async (reqId, otp) => {
         userData.otp = 0
         userData.reqId = newReqId
         await userData.save()
-        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded, name, profileImage })
+        return responseFormater(true, "otp verified", { token, isOnboarded: userData.isOnboarded, name, profileImage, occupation })
     } catch (error) {
         console.log(error);
         return responseFormater(false, error.message)

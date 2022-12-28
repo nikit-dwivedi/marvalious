@@ -193,7 +193,6 @@ exports.getBalanceUser = async (req, res) => {
     }
 }
 
-
 exports.allBalance = async (req, res) => {
     try {
         const balanceDetails = await balanceModel.find()
@@ -202,7 +201,6 @@ exports.allBalance = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
-
 
 exports.editBalance = async (req, res) => {
     try {
