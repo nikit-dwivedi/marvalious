@@ -255,3 +255,25 @@ exports.getCustomerById = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+
+
+exports.getCustomerPurchaseRigs = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const rigData = await partnerModel.find({ customId })
+        return rigData[0] ? success(res, "here is the purchsed rigs" , rigData) : badRequest(res, "details not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
+
+exports.getCustomerBookedRigs = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const bookedData = await bookingModel.find({ customId })
+        return bookedData[0] ? success(res, "here is the booked rigs", bookedData) : badRequest(res, "booking not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
