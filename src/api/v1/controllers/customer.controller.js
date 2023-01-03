@@ -15,6 +15,7 @@ const bankModel = require("../models/bank.model");
 const bookingModel = require("../models/booking.model");
 const transactionModel = require("../models/transaction.model");
 const balanceModel = require("../models/balance.model");
+const settlementModel = require("../models/settlement.model");
 
 module.exports = {
     onboard: async (req, res) => {
@@ -307,6 +308,5 @@ module.exports = {
             console.log(error.message);
             badRequest(res, "something went wrong")
         }
-    }
-
+    },
 }

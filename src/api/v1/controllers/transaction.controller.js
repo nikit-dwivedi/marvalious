@@ -28,7 +28,12 @@ const addtransaction = async (req, res) => {
 
 const allTransaction = async (req, res) => {
     try {
-        const data = await transactionModel.find().sort({amount:-1})
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const customId = token.customId
+        const data = await transactionModel.find({ customId }).sort({ createdAt: -1 })
         return data[0] ? success(res, "here all the transcations" , data) : badRequest(res, "transaction not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
@@ -36,20 +41,7 @@ const allTransaction = async (req, res) => {
 }   
 
 
-const transactionById = async (req, res) => {
-    try {
-        const token = parseJwt(req.headers.authorization)
-        if (!token.customId) {
-            return badRequest(res, "please onboard first")
-        }
-        const customId = token.customId
-        const data = await transactionModel.findOne({ customId }).sort({ timestamps:-1})
-        return data ? success(res, "here are the transaction", data) : badRequest(res, "transaction not found")
-    } catch (error) {
-        return badRequest(res, "something went wrong")
-    }
-}
 
 
 
-module.exports = { addtransaction, allTransaction, transactionById }
+module.exports = { addtransaction, allTransaction }

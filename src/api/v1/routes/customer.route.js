@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, editBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser, allRigSetting, addKycAndNominee, getKycAndNominee, editBankDetail, getBalanceUser } = require('../controllers/customer.controller');
+const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, editBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser, allRigSetting, addKycAndNominee, getKycAndNominee, editBankDetail, getBalanceUser, createSettlement } = require('../controllers/customer.controller');
 const { authenticateUser } = require('../middlewares/authToken');
 
 
@@ -24,6 +24,8 @@ router.get('/rig/all', authenticateUser, getAllRigOfUser)
 router.post('/kyc/nominee', authenticateUser, addKycAndNominee)
 router.get('/kycinfo/nomineeinfo', authenticateUser, getKycAndNominee)
 router.get('/getBalanceUser', getBalanceUser)
+
+
 
 
 module.exports = router;
