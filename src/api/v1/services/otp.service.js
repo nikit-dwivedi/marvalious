@@ -18,12 +18,13 @@ const sendMail = async (email, otp) => {
     } catch (error) {
         console.log(error);
     }
+
 }
 const sendSms = async (number, otp) => {
     try {
         let resposne = await get(`https://api.textlocal.in/send/?apikey=${textlocalapi}=&numbers=${number}&sender=FABLOP&message=` +
             encodeURIComponent(
-                `Greetings from Fablo, ${otp} is your verification code to login into Fablo Platforms.`
+                `Greetings from Marvellous, ${otp} is your verification code to login into Marvellous Mining.`
             ))
     } catch (error) {
         console.log(error)
