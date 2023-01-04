@@ -17,8 +17,8 @@ const settlementSchema = new Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'settled'],
-        default: 'pending'
+        enum: ['Pending','Settled'],
+        default: 'Pending'
     },
 
 }, { timestamps: true })
