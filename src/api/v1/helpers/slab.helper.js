@@ -28,15 +28,14 @@ exports.getSlab = async () => {
 }
 exports.addSlabSetting = async (slabData) => {
     try {
-        const { status, message, data } = slabSettingFormatter(slabData)
+        const { status, message, data } = await slabSettingFormatter(slabData)
         if (!status) {
             console.log(message);
             return responseFormater(false, message)
         }
-        const settingCheck = await slabSettingModel.findOne({ amount: data.amount, percent: data.percent, interest: data.interest, locking: data.locking, availableRigs: data.availableRigs })
-        console.log("==========", data);
+        const settingCheck = await slabSettingModel.findOne({ amount: data.amount, percent: data.percent, interest: data.interest, locking: data.locking })
         if (settingCheck) {
-            return responseFormater(false, "setting already exists ")
+            return responseFormater(false, "setting already exists")
         }
         const saveData = new slabSettingModel(data);
         await saveData.save()
@@ -79,8 +78,6 @@ exports.changeSlabToBooked = async (number = 1) => {
         return responseFormater(false, "not updated")
     }
 }
-
-
 
 
 

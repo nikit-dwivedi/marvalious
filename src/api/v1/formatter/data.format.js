@@ -45,7 +45,6 @@ module.exports = {
             aadhaarBack: kycData.aadhaarBack,
             panNumber: kycData.panNumber,
             panFront: kycData.panFront,
-
         }
     },
     bankFormatter: (customId, bankData) => {
@@ -57,7 +56,7 @@ module.exports = {
             accountNumber: bankData.accountNumber,
             ifsc: bankData.ifsc,
             accountHolderName: bankData.accountHolderName,
-            upiId:bankData.upiId
+            upiId: bankData.upiId
         }
     },
     nomineeFormatter: (customerId, nomineeData) => {
@@ -70,16 +69,19 @@ module.exports = {
         const bookedSlab = previousSlabData ? previousSlabData.bookedSlab : 0
         return { totalSlab, freeSlab, bookedSlab }
     },
-    slabSettingFormatter: (slabData) => {
+    slabSettingFormatter: async (slabData) => {
         try {
             const { amount, percent, interest, locking, slotBookingCharge } = slabData
             const slabSettingId = randomBytes(4).toString('hex')
             const income = (interest * amount) / 100
-            let slot = 1 / ((percent * 1) / 100)    
-            // const slabDetails = slabModel.find()
+            let slotCalculator = 1 / ((percent * 1) / 100)
+            const slabDetails = await slabModel.findOne()
+            const slot = parseInt(slabDetails.freeSlab * slotCalculator)
+            // console.log("=========", slot);
             return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, slotBookingCharge })
         }
         catch (error) {
+            // console.log(error.message);
             return responseFormater(false, error.message)
         }
     },
