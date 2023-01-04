@@ -2,6 +2,7 @@ const { randomBytes } = require('node:crypto');
 const { encryption } = require('../middlewares/authToken');
 const kycModel = require('../models/kyc.model');
 const { responseFormater } = require('./response.format');
+const slabModel = require('../models/slab.model')
 
 module.exports = {
     authFormatter: async (phone) => {
@@ -74,7 +75,8 @@ module.exports = {
             const { amount, percent, interest, locking, slotBookingCharge } = slabData
             const slabSettingId = randomBytes(4).toString('hex')
             const income = (interest * amount) / 100
-            let slot = 1 / ((percent * 1) / 100)
+            let slot = 1 / ((percent * 1) / 100)    
+            // const slabDetails = slabModel.find()
             return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, slotBookingCharge })
         }
         catch (error) {

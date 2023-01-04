@@ -205,6 +205,7 @@ module.exports = {
             }
             return success(res, message)
         } catch (error) {
+            console.log(error);
             return unknownError(res, error.message)
         }
     },
@@ -270,7 +271,6 @@ module.exports = {
             return badRequest(res, "something went wrong")
         }
     },
-
     getKycAndNominee: async (req, res) => {
         try {
             const token = parseJwt(req.headers.authorization)
@@ -294,7 +294,6 @@ module.exports = {
             return badRequest(res, "something went wrong")
         }
     },
-
     getBalanceUser: async (req, res) => {
         try {
             const token = parseJwt(req.headers.authorization)
@@ -309,4 +308,17 @@ module.exports = {
             badRequest(res, "something went wrong")
         }
     },
+    getSettlementOfUser: async (req, res) => {
+        try {
+            const token = parseJwt(req.headers.authorization)
+            if (!token.customId) {
+                return badRequest(res, "please onboard first")
+            }
+            const customId = token.customId
+            const settlementData = await settlementModel.find({ customId })
+            return settlementData[0] ? success(res, "here is the settlement details", settlementData) : badRequest(res, "settlement not found")
+        } catch (error) {
+            badRequest(res, "something went wrong")
+        }
+    }
 }

@@ -70,7 +70,7 @@ exports.editRigSetting = async (req, res) => {
             const income = req.body.income
             const locking = req.body.locking
             const slot = req.body.slot
-            const bookingPerCharge = req.body.bookingPerCharge
+            const slotBookingCharge = req.body.slotBookingCharge
             if (amount) {
                 slabSettingData.amount = amount
             }
@@ -89,14 +89,23 @@ exports.editRigSetting = async (req, res) => {
             if (slot) {
                 slabSettingData.slot = slot
             }
-            if (bookingPerCharge) {
-                slabSettingData.bookingPerCharge = bookingPerCharge
+            if (slotBookingCharge) {
+                slabSettingData.slotBookingCharge = slotBookingCharge
             }
             const rigData = await slabSettingData.save()
             rigData ? success(res, "rig setting updated") : badRequest(res, "rig setting cannot be updated")
         }
     } catch (error) {
         console.log(error.message);
+        return badRequest(res, "something went wrong")
+    }
+}
+exports.deleteRigSetting = async (req, res) => {
+    try {
+        const slabSettingId = req.params.slabSettingId
+        const slabSettingData = await slabSettingModel.findByIdAndDelete({ slabSettingId })
+        return slabSettingData ? success(res, "rig setting deleted"): badRequest(res, "rig setting cannot be deleted")
+    } catch (error) {
         return badRequest(res, "something went wrong")
     }
 }
@@ -109,7 +118,6 @@ exports.getAllCustomer = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
-
 
 exports.addPartnershipByAdmin = async (req, res) => {
     try {
@@ -286,9 +294,12 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
         if (balanceList) {
             for (i = 0; i < balanceList.length; i++) {
                 const customId = balanceList[i].customId
-                const bankData = await bankModel.findOne({ customId })
+                console.log("customId=======>",customId);
+                const bankData = await bankModel.find({ customId })
+                console.log("bankData===>",bankData);
                 if (bankData) {
-                    const kycDetail = await kycModel.find({ isVerified: true })
+                    const kycDetail = await kycModel.find({ isVerified: true }, { customId })
+                    console.log("kycDetail====>",kycDetail);
                     if (kycDetail) {
                         const data = {
                             customId: balanceList[i].customId,
@@ -296,7 +307,11 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
                         }
                         const settlementData = new settlementModel(data)
                         formattedData = await settlementData.save()
-                        // const balanceDetails = await balanceModel.findOne({ customId })
+                        const balanceDetails = await balanceModel.findOne({ customId })
+                        const profit = 0
+                        balanceDetails.profit[i] = profit
+                        const updateProfit = new balanceModel(balanceDetails)
+                        await updateProfit.save()
                     }
                 }
             }

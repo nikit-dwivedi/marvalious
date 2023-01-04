@@ -47,7 +47,8 @@ const partnerSchema = new Schema({
     profit: {
         type: Number,
         default: 0
-    }
+    }, 
+ 
 })
 
 const partnerModel = mongoose.model('partner', partnerSchema);
