@@ -18,7 +18,6 @@ const sendMail = async (email, otp) => {
     } catch (error) {
         console.log(error);
     }
-
 }
 const sendSms = async (number, otp) => {
     try {
@@ -26,6 +25,7 @@ const sendSms = async (number, otp) => {
             encodeURIComponent(
                 `Greetings from Marvellous, ${otp} is your verification code to login into Marvellous Mining.`
             ))
+        // console.log(resposne);
     } catch (error) {
         console.log(error)
     }
