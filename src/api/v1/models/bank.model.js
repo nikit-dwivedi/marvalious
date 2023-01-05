@@ -11,16 +11,20 @@ const bankSchema = new Schema({
         unique: true
     },
     bankName: {
-        type: String
+        type: String,
+        required:true
     },
     accountNumber: {
-        type: String
+        type: String,
+        required: true
     },
     ifsc: {
-        type: String
+        type: String,
+        required: true
     },
     accountHolderName: {
-        type: String
+        type: String,
+        required: true
     },
     upiId: {
         type: String

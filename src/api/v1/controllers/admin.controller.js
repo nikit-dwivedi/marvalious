@@ -294,12 +294,12 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
         if (balanceList) {
             for (i = 0; i < balanceList.length; i++) {
                 const customId = balanceList[i].customId
-                console.log("customId=======>",customId);
-                const bankData = await bankModel.find({ customId })
-                console.log("bankData===>",bankData);
+                // console.log("customId=======>",customId);
+                const bankData = await bankModel.findOne({ customId })
+                // console.log("bankData===>",bankData);
                 if (bankData) {
                     const kycDetail = await kycModel.find({ isVerified: true }, { customId })
-                    console.log("kycDetail====>",kycDetail);
+                    // console.log("kycDetail====>",kycDetail);
                     if (kycDetail) {
                         const data = {
                             customId: balanceList[i].customId,
@@ -323,7 +323,6 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
     }
 }
 
-
 exports.getAllSettlement = async (req, res) => {
     try {
         const settlementData = await settlementModel.find()
@@ -335,16 +334,18 @@ exports.getAllSettlement = async (req, res) => {
 
 exports.editSettlement = async (req, res) => {
     try {
-        const settlementList = await settlementModel.find({ status: 'pending' })
+        const settlementList = await settlementModel.find({ status: 'Processing' })
+        let settledData;
+        console.log(settlementList);
         if (settlementList) {
             for (i = 0; i < settlementList.length; i++) {
-                settlementList.status[i] = 'settled'
-                const settledData = new settlementModel(settlementList)
-                return settledData.save() ? success(res, "settled") : badRequest(res, "settlement not settled")
+                settledData = settlementList[i]
+                settledData.status = 'Settled'
             }
+            return settledData.save() ? success(res, "settled") : badRequest(res, "settlement not settled")
         }
     } catch (error) {
-        console.log(error.message);
+        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -358,5 +359,7 @@ exports.kycDelete = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+
+
 
 
