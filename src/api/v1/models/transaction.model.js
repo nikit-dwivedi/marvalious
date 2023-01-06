@@ -11,14 +11,11 @@ const transactionSchema = new Schema({
     },
     type: {
         type: String,
-        enum: ['Credited', 'Invested']
+        enum: ['Credited', 'Invested' , 'Booking Settled']
     },
     amount: {
         type: Number
-    },
-    Date: {
-        type: String,
-    }, 
+    }
 }, { timestamps: true })
 
 const transactionModel = mongoose.model('transaction', transactionSchema)

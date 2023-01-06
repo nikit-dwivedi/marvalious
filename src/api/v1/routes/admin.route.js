@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete } = require('../controllers/admin.controller');
+const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi } = require('../controllers/admin.controller');
 const router = express.Router();
 
 
@@ -24,5 +24,6 @@ router.get('/settlement', createSettlement)
 router.get('/allSettlements', getAllSettlement)
 router.patch('/settled', editSettlement)
 router.get('/kyc/fake/:customId', kycDelete)
+router.post('/dailyRoi', DailyRoi)
 
 module.exports = router 

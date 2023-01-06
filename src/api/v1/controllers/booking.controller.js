@@ -1,7 +1,11 @@
-const {success, badRequest } = require("../helpers/response_helper")
+const { success, badRequest } = require("../helpers/response_helper")
 const { parseJwt } = require("../middlewares/authToken");
+const { getSlabSettingById, changeSlabToBooked, getAllSlabSetting } = require("../helpers/slab.helper");
+const { addPartner, getPartnerOfUser } = require("../helpers/partner.helper");
+const balanceModel = require("../models/balance.model");
 const bookingModel = require("../models/booking.model");
 const slabSettingModel = require("../models/slabSetting.model");
+const transactionModel = require("../models/transaction.model");
 
 
 
@@ -50,23 +54,6 @@ const getAllSlots = async (req, res) => {
         badRequest(res, "something went wrong")
     }
 }
-
-// const bookingById = async (req, res) => {
-//     try {
-//         const token = parseJwt(req.headers.authorization)
-//         if (!token.customId) {
-//             return badRequest(res, "please onboard first")
-//         }
-//         const  customId = token.customId
-//         const data = await bookingModel.findOne({customId})
-//         return data ? success(res, "here is the bookings", data) : badRequest(res, "booking not found")
-//     } catch (error) {
-//         console.log(error.message);
-//         return badRequest(res, "something went wrong")
-//     }
-// }
-
-
 const allBookings = async (req, res) => {
     try {
         const bookingData = await bookingModel.find()
@@ -82,8 +69,86 @@ const allBookingUser = async (req, res) => {
             return badRequest(res, "please onboard first")
         }
         const customId = token.customId
-        const bookingData = await bookingModel.find({customId})
+        const bookingData = await bookingModel.find({ customId :customId, isPurchased: false , isRejected:false})
         return bookingData[0] ? success(res, "here is all the bookings", bookingData) : badRequest(res, "booking not found")
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
+const bookingRejected = async (req, res) => {
+    try {
+        const token = parseJwt(req.headers.authorization)
+        if (!token.customId) {
+            return badRequest(res, "please onboard first")
+        }
+        const customId = token.customId
+        const id = req.params.bookingId
+        const bookingData = await bookingModel.findById(id)
+        if (bookingData) {
+            bookingData.isRejected = true
+            await bookingData.save()
+            const balanceData = await balanceModel.findOne({ customId })
+            if (balanceData) {
+                const profit = bookingData.bookingAmount * 90 / 100
+                balanceData.profit = balanceData.profit + profit
+                await balanceData.save()
+            }
+            const profit = bookingData.bookingAmount * 90 / 100
+            let type = 'Booking Settled'
+            const data = {
+                customId: customId,
+                type: type,
+                amount: profit
+            }
+            const transaction = new transactionModel(data)
+            console.log(transaction);
+            await transaction.save()
+            return success(res, "booking withdraw")
+        }
+    } catch (error) {
+        console.log(error);
+        return badRequest(res, "something went wrong")
+    }
+}
+
+const purchaseBooking = async (req, res) => {
+    try {
+        const _id = req.body._id
+        const bookingData = await bookingModel.findOne({ _id })
+        if (bookingData) {
+            bookingData.isRejected = true
+            const rigSettingId = req.body.rigSettingId
+            const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
+            if (!rigStatus) {
+                return badRequest(res, rigMessage)
+            }
+            const token = parseJwt(req.headers.authorization)
+            const { status, message } = await addPartner(token.customId, rigData)
+            if (!status) {
+                return badRequest(res, message)
+            }
+            if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
+                await changeSlabToBooked()
+            }
+            if (addPartner) {
+                const rigId = rigSettingId
+                const balanceData = await balanceModel.findOne({ customId: token.customId })
+                if (balanceData) {
+                    balanceData.investAmount = balanceData.investAmount + rigData.amount
+                    await new balanceModel(balanceData).save()
+                }
+                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                const data = {
+                    customId: token.customId,
+                    type: "Invested",
+                    amount: rigData.amount
+                }
+                const transaction = new transactionModel(data)
+                await transaction.save()
+            }
+            return success(res, message)
+        }
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
@@ -93,4 +158,9 @@ const allBookingUser = async (req, res) => {
 
 
 
-module.exports = { createBooking, getAllSlots, allBookings, allBookingUser }
+
+
+
+
+
+module.exports = { createBooking, getAllSlots, allBookings, allBookingUser, bookingRejected, purchaseBooking }
