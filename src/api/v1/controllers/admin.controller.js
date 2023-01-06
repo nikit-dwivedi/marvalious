@@ -104,7 +104,7 @@ exports.deleteRigSetting = async (req, res) => {
     try {
         const slabSettingId = req.params.slabSettingId
         const slabSettingData = await slabSettingModel.findByIdAndDelete({ slabSettingId })
-        return slabSettingData ? success(res, "rig setting deleted"): badRequest(res, "rig setting cannot be deleted")
+        return slabSettingData ? success(res, "rig setting deleted") : badRequest(res, "rig setting cannot be deleted")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
@@ -289,14 +289,15 @@ exports.getCustomerBookedRigs = async (req, res) => {
 
 exports.createSettlement = async (req, res) => {       // ==============for profit only===============//
     try {
-        const balanceList = await balanceModel.find()
+        const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
+        console.log(balanceList);
         let formattedData;
         if (balanceList) {
             for (i = 0; i < balanceList.length; i++) {
                 const customId = balanceList[i].customId
                 // console.log("customId=======>",customId);
                 const bankData = await bankModel.findOne({ customId })
-                // console.log("bankData===>",bankData);
+                console.log("bankData===>", bankData);
                 if (bankData) {
                     const kycDetail = await kycModel.find({ isVerified: true }, { customId })
                     // console.log("kycDetail====>",kycDetail);
@@ -308,8 +309,9 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
                         const settlementData = new settlementModel(data)
                         formattedData = await settlementData.save()
                         const balanceDetails = await balanceModel.findOne({ customId })
+                        // console.log(balanceDetails);
                         const profit = 0
-                        balanceDetails.profit[i] = profit
+                        balanceDetails.profit = profit
                         const updateProfit = new balanceModel(balanceDetails)
                         await updateProfit.save()
                     }
@@ -336,13 +338,15 @@ exports.editSettlement = async (req, res) => {
     try {
         const settlementList = await settlementModel.find({ status: 'Processing' })
         let settledData;
-        console.log(settlementList);
+        // let result
         if (settlementList) {
             for (i = 0; i < settlementList.length; i++) {
                 settledData = settlementList[i]
                 settledData.status = 'Settled'
+                // console.log(settledData.status);
+                await settledData.save()
             }
-            return settledData.save() ? success(res, "settled") : badRequest(res, "settlement not settled")
+            return success(res, "settled")
         }
     } catch (error) {
         console.log(error);
@@ -359,7 +363,48 @@ exports.kycDelete = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
-
+exports.DailyRoi = async (req, res) => {
+    try {
+        const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
+        let newdate = new Date(currentDate)
+        console.log(newdate);
+        // const date = newdate.getDate()
+        // let month = newdate.getMonth()+1
+        // let year = newdate.getFullYear()
+        // const time = `${date}-${month}-${year}`
+        const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate}})
+        console.log("==================", partnershipList);
+        if (partnershipList) {
+            for (i = 0; i < partnershipList.length; i++) {
+                const principleAmount = partnershipList[i].slabInfo.amount
+                const rate = partnershipList[i].slabInfo.interest
+                const time = 1  
+                const SI = principleAmount * rate * time / 100
+                partnershipList.profit = partnershipList.profit + SI
+                // const balanceList = await balanceModel.find()
+                // balanceList.profit = balanceList.profit + SI
+                await partnershipList.save()
+                const balanceData = {
+                    customId: partnershipList.customId,
+                    profit: profit + SI
+                }
+                const updateBalanceData = new balanceModel(balanceData)
+                await updateBalanceData.save()
+                const data = { 
+                    customId: partnershipList.customId,
+                    type: 'Credited',
+                    amount: SI,
+                }
+                const updateTransaction = new transactionModel(data)
+                await updateTransaction.save()
+            }
+            return success(res, "Roi is created")
+        }
+    } catch (error) {
+        console.log(error.message);
+        return badRequest("something went wrong")
+    }
+}
 
 
 

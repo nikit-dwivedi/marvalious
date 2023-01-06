@@ -49,7 +49,7 @@ const partnerSchema = new Schema({
         default: 0
     }, 
  
-})
+}, { timestamps: true })
 
 const partnerModel = mongoose.model('partner', partnerSchema);
 module.exports = partnerModel
