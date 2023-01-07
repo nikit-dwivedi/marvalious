@@ -343,7 +343,6 @@ exports.editSettlement = async (req, res) => {
             for (i = 0; i < settlementList.length; i++) {
                 settledData = settlementList[i]
                 settledData.status = 'Settled'
-                // console.log(settledData.status);
                 await settledData.save()
             }
             return success(res, "settled")
@@ -367,31 +366,23 @@ exports.DailyRoi = async (req, res) => {
     try {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
-        console.log(newdate);
-        // const date = newdate.getDate()
-        // let month = newdate.getMonth()+1
-        // let year = newdate.getFullYear()
-        // const time = `${date}-${month}-${year}`
-        const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate}})
-        console.log("==================", partnershipList);
+        const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate}})  
         if (partnershipList) {
             for (i = 0; i < partnershipList.length; i++) {
-                const principleAmount = partnershipList[i].slabInfo.amount
-                const rate = partnershipList[i].slabInfo.interest
+                const partnership = partnershipList[i]
+                const principleAmount =partnership.slabInfo.amount
+                const rate = partnership.slabInfo.interest
                 const time = 1  
-                const SI = principleAmount * rate * time / 100
-                partnershipList.profit = partnershipList.profit + SI
-                // const balanceList = await balanceModel.find()
-                // balanceList.profit = balanceList.profit + SI
-                await partnershipList.save()
-                const balanceData = {
-                    customId: partnershipList.customId,
-                    profit: profit + SI
-                }
-                const updateBalanceData = new balanceModel(balanceData)
-                await updateBalanceData.save()
+                const SI = ((principleAmount * rate * time / 100)/12)/30
+                partnership.profit = partnership.profit + SI
+                await partnership.save()
+
+                const customId = partnership.customId
+                const balanceData = await balanceModel.findOne({customId})
+                balanceData.profit = balanceData.profit + SI
+                await balanceData.save()
                 const data = { 
-                    customId: partnershipList.customId,
+                    customId: customId,
                     type: 'Credited',
                     amount: SI,
                 }
