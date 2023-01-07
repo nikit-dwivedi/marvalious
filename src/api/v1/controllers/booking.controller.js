@@ -118,6 +118,7 @@ const purchaseBooking = async (req, res) => {
         const bookingData = await bookingModel.findOne({ _id })
         if (bookingData) {
             bookingData.isRejected = true
+            await bookingData.save()
             const rigSettingId = req.body.rigSettingId
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
