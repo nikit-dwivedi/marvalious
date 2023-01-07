@@ -13,6 +13,7 @@ const transactionModel = require('../models/transaction.model')
 const kycModel = require("../models/kyc.model");
 const bankModel = require("../models/bank.model");
 const settlementModel = require("../models/settlement.model")
+const {roiPartnership} = require("../helpers/Roi.helper")
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -297,23 +298,21 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
                 const customId = balanceList[i].customId
                 // console.log("customId=======>",customId);
                 const bankData = await bankModel.findOne({ customId })
-                console.log("bankData===>", bankData);
+                // console.log("bankData===>", bankData);
                 if (bankData) {
                     const kycDetail = await kycModel.find({ isVerified: true }, { customId })
                     // console.log("kycDetail====>",kycDetail);
                     if (kycDetail) {
                         const data = {
                             customId: balanceList[i].customId,
-                            amount: balanceList[i].profit
+                            amount: parseInt(balanceList[i].profit)
                         }
                         const settlementData = new settlementModel(data)
                         formattedData = await settlementData.save()
                         const balanceDetails = await balanceModel.findOne({ customId })
-                        // console.log(balanceDetails);
                         const profit = 0
                         balanceDetails.profit = profit
-                        const updateProfit = new balanceModel(balanceDetails)
-                        await updateProfit.save()
+                        await balanceDetails.save()                 
                     }
                 }
             }
@@ -362,40 +361,50 @@ exports.kycDelete = async (req, res) => {
         return badRequest(res, "something went wrong")
     }
 }
+// exports.DailyRoi = async (req, res) => {
+//     try {
+//         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
+//         let newdate = new Date(currentDate)
+//         const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate } })  
+//         if (partnershipList) {
+//             for (i = 0; i < partnershipList.length; i++) {
+//                 const partnership = partnershipList[i]
+//                 const principleAmount = partnership.slabInfo.amount
+//                 const rate = partnership.slabInfo.interest
+//                 const time = 1
+//                 const SI = ((principleAmount * rate * time / 100) / 12) / 30
+//                 partnership.profit = partnership.profit + SI
+//                 await partnership.save()
+//                 const customId = partnership.customId
+//                 const balanceData = await balanceModel.findOne({ customId })
+//                 balanceData.profit = balanceData.profit + SI
+//                 await balanceData.save()
+//                 const data = {
+//                     customId: customId,
+//                     type: 'Credited',
+//                     amount: SI,
+//                 }
+//                 const updateTransaction = new transactionModel(data)
+//                 await updateTransaction.save()
+//             }
+//             return success(res, "Roi is created")
+//         }
+//     } catch (error) {
+//         console.log(error);
+//         return badRequest(res , "something went wrong")
+//     }
+// }
+
 exports.DailyRoi = async (req, res) => {
     try {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
-        const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate}})  
-        if (partnershipList) {
-            for (i = 0; i < partnershipList.length; i++) {
-                const partnership = partnershipList[i]
-                const principleAmount =partnership.slabInfo.amount
-                const rate = partnership.slabInfo.interest
-                const time = 1  
-                const SI = ((principleAmount * rate * time / 100)/12)/30
-                partnership.profit = partnership.profit + SI
-                await partnership.save()
-
-                const customId = partnership.customId
-                const balanceData = await balanceModel.findOne({customId})
-                balanceData.profit = balanceData.profit + SI
-                await balanceData.save()
-                const data = { 
-                    customId: customId,
-                    type: 'Credited',
-                    amount: SI,
-                }
-                const updateTransaction = new transactionModel(data)
-                await updateTransaction.save()
-            }
-            return success(res, "Roi is created")
-        }
+        await roiPartnership(newdate)
+        return success (res, "Roi is created")
     } catch (error) {
-        console.log(error.message);
-        return badRequest("something went wrong")
+        console.log(error);
+        return badRequest(res, "something went wrong")
     }
 }
-
 
 

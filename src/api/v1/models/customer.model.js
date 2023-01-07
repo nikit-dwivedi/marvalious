@@ -30,7 +30,7 @@ const customerSchema = new Schema({
     },
     profileImage: {
         type: String,
-        default:'https://res.cloudinary.com/djkxsdqmh/image/upload/v1672912461/kyc/male-placeholder-image-removebg-preview-removebg-preview_czrjom.png'
+        default: 'https://res.cloudinary.com/fablo/image/upload/v1673077347/Marvellous_Kyc/male-placeholder-image-removebg-preview-removebg-preview_dab09r.png'
     },
     isVerified: {
         type: Boolean,
