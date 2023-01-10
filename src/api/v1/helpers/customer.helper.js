@@ -34,6 +34,7 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
 exports.customerById = async (userId) => {
     try {
         const customerData = await customerModel.findOne({ userId }).select('-_id -__v -createdAt -updatedAt')
+        console.log(customerData);
         if (!customerData) {
             return { status: false, message: "customer not found", data: {} }
         }
