@@ -1,12 +1,14 @@
 const { badRequest, success } = require("./response_helper")
 const { responseFormater } = require("../formatter/response.format");
+const partnerModel = require("../models/patner.model");
+const balanceModel = require("../models/balance.model");
+const transactionModel = require("../models/transaction.model");
 
-exports.roiPartnership = async (newdate) => {
+exports.roiPartnership = async () => {
     try {
         const partnershipList = await partnerModel.find({ createdAt: { $lte: newdate } })
         if (partnershipList) {
             for (const partnership of partnershipList) {
-                partnership = partnershipList[i]
                 const principleAmount = partnership.slabInfo.amount
                 const rate = partnership.slabInfo.interest
                 const time = 1
@@ -14,8 +16,8 @@ exports.roiPartnership = async (newdate) => {
                 partnership.profit = partnership.profit + SI
                 await partnership.save()
                 const customId = partnership.customId
-                this.roiBalance(customId)
-                this.roiTransaction(customId)
+                await this.roiBalance(customId, SI)
+                await this.roiTransaction(customId, SI)
             }
             // return success(res, "partnership profit updated")
         }
@@ -25,7 +27,7 @@ exports.roiPartnership = async (newdate) => {
 }
 
 
-exports.roiBalance = async (customId) => {
+exports.roiBalance = async (customId, SI) => {
     try {
         const balanceData = await balanceModel.findOne({ customId })
         balanceData.profit = balanceData.profit + SI
@@ -36,7 +38,7 @@ exports.roiBalance = async (customId) => {
     }
 }
 
-exports.roiTransaction = async (customId) => {
+exports.roiTransaction = async (customId, SI) => {
     try {
         const data = {
             customId: customId,

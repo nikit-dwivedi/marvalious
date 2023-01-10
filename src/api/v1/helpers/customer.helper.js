@@ -4,6 +4,7 @@ const { generateUserToken, parseJwt } = require('../middlewares/authToken');
 const authModel = require('../models/auth.model');
 const customerModel = require('../models/customer.model');
 const balanceModel = require('../models/balance.model')
+const newAuthModel = require('../models/newAuth.model')
 
 
 exports.onboardCustomer = async (userId, phone, bodyData) => {
@@ -18,7 +19,6 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
         const saveData = new customerModel(formattedData);
         await markUserOnboarded(userId);
         await saveData.save()
-
         const balanceData = {
             customId: formattedData.customerId,
             investAmount: 0,
@@ -52,7 +52,7 @@ exports.getAllCustomer = async () => {
 }
 const markUserOnboarded = async (userId) => {
     try {
-        await authModel.findOneAndUpdate({ userId: userId }, { isOnboarded: true })
+        await newAuthModel.findOneAndUpdate({ userId: userId }, { isOnboarded: true })
         return true
     } catch (error) {
         return false
