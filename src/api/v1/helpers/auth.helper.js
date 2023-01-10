@@ -1,4 +1,5 @@
 const authModel = require('../models/auth.model');
+const newAuthModel = require('../models/newAuth.model')
 const { sendSms } = require('../services/otp.service');
 const { authFormatter } = require('../formatter/data.format');
 const { randomBytes } = require('node:crypto');
@@ -27,7 +28,7 @@ exports.checkAuthByPhone = async (phone) => {
 }
 exports.authByUserId = async (userId) => {
     try {
-        const authData = await authModel.findOne({ userId });
+        const authData = await newAuthModel.findOne({ userId });
         return authData ? authData : false;
     } catch (error) {
         return false

@@ -399,7 +399,8 @@ exports.DailyRoi = async (req, res) => {
     try {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
-        await roiPartnership(newdate)
+        await roiPartnership()
+        console.log();
         return success (res, "Roi is created")
     } catch (error) {
         console.log(error);
