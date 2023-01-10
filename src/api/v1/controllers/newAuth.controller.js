@@ -7,29 +7,36 @@ const { generateUserToken } = require('../middlewares/authToken');
 
 exports.login = async (req, res) => {
     try {
-        const data = {
+        const body = {
             date : new Date().getDate(),
             userId: req.body.userId,
             phone: req.body.phone   
         }
-        // console.log(data);
-        const userData = await newAuthModel.findOne({ userId: data.userId })
-        const customId = await customerById({ userId: userData.userId })
-        let token = ""
-        let name = ""
-        let profileImage = ""
-        let occupation = ""
-        if (customId.status) {
-            token = generateUserToken(customId.data)
-            name = customId.name
-            profileImage = customId.profileImage
-            occupation = customId.occupation
-            const saveData = new newAuthModel(data)``
-            await saveData.save()
+        const userData = await newAuthModel.findOne({ userId: body.userId })
+        if (!userData) {
+            const token = generateUserToken(body)
+            const data = new newAuthModel(body)
+            const result = await data.save()
+            return result ? success(res, "login successful", { token, name: "", profileImage: "", isOnboarded: false, occupation: "" }) : badRequest(res, "cannot login")
         } else {
-            token = generateUserToken(userData)
+            let token
+            let name = ""
+            let profileImage = ""
+            let occupation = ""
+            let isOnboarded
+            const customData = await customerById({ userId: userData.userId })
+            if (customData.status) {
+                token = generateUserToken(customData.data)
+                name = customData.name
+                profileImage = customData.profileImage
+                occupation = customData.occupation
+                isOnboarded = true
+            } else {
+                isOnboarded = false
+                token = generateUserToken(userData)          
+            }
+            return token ? success(res, "login successful", { token, name, profileImage, isOnboarded, occupation }) : badRequest(res, "cannot login")
         }
-        return success(res, "login successful", {token , name , profileImage, occupation})
     } catch (error) {
         console.log(error);
         return unknownError(res, error.message)
