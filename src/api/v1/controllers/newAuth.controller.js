@@ -24,15 +24,15 @@ exports.login = async (req, res) => {
             let profileImage = ""
             let occupation = ""
             let isOnboarded
-            const customData = await customerById({ userId: userData.userId })
+            const customData = await customerById(userData.userId)
+            console.log(customData);
             if (customData.status) {
                 token = generateUserToken(customData.data)
-                name = customData.name
-                profileImage = customData.profileImage
-                occupation = customData.occupation
-                isOnboarded = true
+                name = customData.data.name
+                profileImage = customData.data.profileImage
+                occupation = customData.data.occupation
+                isOnboarded = userData.isOnboarded
             } else {
-                isOnboarded = false
                 token = generateUserToken(userData)          
             }
             return token ? success(res, "login successful", { token, name, profileImage, isOnboarded, occupation }) : badRequest(res, "cannot login")
