@@ -291,7 +291,7 @@ exports.getCustomerBookedRigs = async (req, res) => {
 exports.createSettlement = async (req, res) => {       // ==============for profit only===============//
     try {
         const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
-        console.log(balanceList);
+        // console.log("============",balanceList);
         let formattedData;
         if (balanceList) {
             for (i = 0; i < balanceList.length; i++) {
