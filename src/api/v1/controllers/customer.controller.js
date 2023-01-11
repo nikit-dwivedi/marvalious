@@ -87,7 +87,7 @@ module.exports = {
     },
     editBankDetails: async (req, res) => {
         try {
-            console.log("=======");
+            // console.log("=======");
             const token = parseJwt(req.headers.authorization)
             if (!token.customId) {
                 return badRequest(res, "please onboard first")
