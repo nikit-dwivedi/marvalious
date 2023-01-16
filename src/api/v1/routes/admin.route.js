@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi } = require('../controllers/admin.controller');
+const { addRigsAmount, getRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi, addConfig, getConfig, createBookingByAdmin, getAllBooking, purchaseBooking, totalInvestedAmount, totalBookingAmount } = require('../controllers/admin.controller');
 const router = express.Router();
 
 
@@ -25,5 +25,14 @@ router.get('/allSettlements', getAllSettlement)
 router.patch('/settled', editSettlement)
 router.get('/kyc/fake/:customId', kycDelete)
 router.post('/dailyRoi', DailyRoi)
+router.post('/config', addConfig)
+router.get('/allconfig', getConfig)
+router.post('/booking/:customId', createBookingByAdmin)
+router.get('/allBookings/:customId', getAllBooking)
+router.post('/purchaseBooking/:customId', purchaseBooking)
+router.get('/partnershipAmount', totalInvestedAmount)
+router.get('/bookingAmount', totalBookingAmount)
+
+
 
 module.exports = router 

@@ -4,6 +4,7 @@ const { addSlab, getSlab, addSlabSetting } = require("../helpers/slab.helper")
 const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
 const { parseJwt } = require("../middlewares/authToken");
 const { addPartner } = require("../helpers/partner.helper");
+const slabModel = require("../models/slab.model")
 const balanceModel = require('../models/balance.model')
 const customerModel = require("../models/customer.model")
 const slabSettingModel = require("../models/slabSetting.model")
@@ -13,7 +14,8 @@ const transactionModel = require('../models/transaction.model')
 const kycModel = require("../models/kyc.model");
 const bankModel = require("../models/bank.model");
 const settlementModel = require("../models/settlement.model")
-const {roiPartnership} = require("../helpers/Roi.helper")
+const { roiPartnership } = require("../helpers/Roi.helper")
+const configModel = require('../models/config.model')
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -42,6 +44,26 @@ exports.getRigs = async (req, res) => {
     }
 }
 
+exports.editRigs = async (req, res) => {
+    try {
+        const rigData = await slabModel.findOne()
+        if (rigData) {
+            const totalSlab = req.body.totalSlab
+            const freeSlab = req.body.freeSlab
+            if (totalSlab) {
+                rigData.totalSlab = totalSlab
+            } 
+            if (freeSlab) {
+                rigData.freeSlab = freeSlab
+            }
+            rigData.bookedSlab = 0
+            await rigData.save()
+        }
+    } catch (error) {
+        return badRequest(res, "something went wrong")
+    }
+}
+
 exports.addRigSetting = async (req, res) => {
     try {
         const { status, message } = await addSlabSetting(req.body)
@@ -53,8 +75,14 @@ exports.addRigSetting = async (req, res) => {
 
 exports.getAllRigSetting = async (req, res) => {
     try {
-        const rigData = await slabSettingModel.find()
-        return rigData[0] ? success(res, "here is the rig settings", rigData) : badRequest(res, "rig setting not found")
+        const slabSettingList = await slabSettingModel.find().select("-_id -__v")
+        for (const slabData of slabSettingList) {
+            let slotCalculator = 1 / ((slabData.percent * 1) / 100)
+            const slabDetails = await slabModel.findOne()
+            const slot = parseInt(slabDetails.freeSlab * slotCalculator)
+            slabData.slot = slot
+        }
+        return slabSettingList[0] ? success(res, "here is the rig settings", slabSettingList) : badRequest(res, "rig setting not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
@@ -291,17 +319,13 @@ exports.getCustomerBookedRigs = async (req, res) => {
 exports.createSettlement = async (req, res) => {       // ==============for profit only===============//
     try {
         const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
-        // console.log("============",balanceList);
         let formattedData;
         if (balanceList) {
             for (i = 0; i < balanceList.length; i++) {
                 const customId = balanceList[i].customId
-                // console.log("customId=======>",customId);
                 const bankData = await bankModel.findOne({ customId })
-                // console.log("bankData===>", bankData);
                 if (bankData) {
                     const kycDetail = await kycModel.find({ isVerified: true }, { customId })
-                    // console.log("kycDetail====>",kycDetail);
                     if (kycDetail) {
                         const data = {
                             customId: balanceList[i].customId,
@@ -400,7 +424,6 @@ exports.DailyRoi = async (req, res) => {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
         await roiPartnership()
-        console.log();
         return success (res, "Roi is created")
     } catch (error) {
         console.log(error);
@@ -408,4 +431,145 @@ exports.DailyRoi = async (req, res) => {
     }
 }
 
+exports.addConfig = async (req, res) => {
+    try {
+      let configData = await configModel.findOne()
+        if (configData) {
+            const version = req.body.version
+            const tittle = req.body.tittle
+            const message = req.body.message
+            if (version) {
+                configData.version = version                
+            } 
+            if (tittle) {
+                configData.tittle = tittle  
+            }
+            if (message) {
+                configData.messgae = message 
+            }
+        } else {
+            const data = {
+                version: req.body.version,
+                tittle: req.body.tittle,
+                message: req.body.message
+            }
+             configData = new configModel(data)
+            }
+        const formattedData = await configData.save()
+        return formattedData ? success(res, "configuaration added") : badRequest("cannot added config")
+    } catch (error) {
+        console.log(error.message);
+        return badRequest(res, "Something went wrong")
+    }
+}
 
+exports.getConfig = async (req, res) => {
+    try {
+        const configData = await configModel.findOne()
+        return configData ? success(res, "config details" , configData): badRequest(res, "config details cannot found")
+    } catch (error) {
+        console.log(error.message);
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.createBookingByAdmin = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const data = req.body
+        let index = {}
+        for (let rigId in data) {
+            const slabSettingId = rigId
+            const slot = data[rigId]
+            const rigDetails = await slabSettingModel.findOne({ slabSettingId })
+            const percent = rigDetails.percent
+            const bookingAmount = rigDetails.slotBookingCharge * slot
+            data.slot = slot
+            data.percent = percent
+            data.bookingAmount = bookingAmount
+            data.customId = customId
+            data.rigId = rigId
+            const remainingAmount = rigDetails.amount * slot - bookingAmount
+            data.remainingAmount = remainingAmount
+            index = new bookingModel(data)
+            await index.save()
+        }
+        return index ? success(res, "booking is created") : badRequest(res, "booking not created")
+    } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.getAllBooking = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const bookingList = await bookingModel.find({customId})
+        return bookingList[0] ? success(res, "booking details", bookingList ):badRequest(res, "booking cannot be found")
+    } catch (error) {
+        console.log(error);
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.purchaseBooking = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const _id = req.body._id
+        const bookingData = await bookingModel.findOne({ _id })
+        if (bookingData) {
+            bookingData.isRejected = true
+            await bookingData.save()
+            const rigSettingId = req.body.rigSettingId
+            const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
+            if (!rigStatus) {
+                return badRequest(res, rigMessage)
+            }
+            const { status, message } = await addPartner(customId, rigData)
+            if (!status) {
+                return badRequest(res, message)
+            }
+            if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
+                await changeSlabToBooked()
+            }
+            if (addPartner) {
+                const rigId = rigSettingId
+                const balanceData = await balanceModel.findOne({ customId: customId })
+                if (balanceData) {
+                    balanceData.investAmount = balanceData.investAmount + rigData.amount
+                    await new balanceModel(balanceData).save()
+                }
+                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                const data = {
+                    customId: customId,
+                    type: "Invested",
+                    amount: rigData.amount
+                }
+                const transaction = new transactionModel(data)
+                await transaction.save()
+            }
+            return success(res, message)
+        }
+    } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+
+exports.totalInvestedAmount = async (req, res) => {
+    try {
+        const totalInvestedAmount = await partnerModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$slabInfo.amount" } } }])
+        return totalInvestedAmount ? success(res, "total invested amount", totalInvestedAmount) : badRequest(res, "invested amount not found")    
+    } catch (error) {
+        console.log(error);
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.totalBookingAmount = async (req, res) => {
+    try {
+        const totalBookingAmount = await bookingModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
+        return totalBookingAmount ? success(res, "total booking amount", totalBookingAmount):badRequest(res, "booking amount not found")
+    } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}

@@ -74,11 +74,11 @@ module.exports = {
             const { amount, percent, interest, locking, slotBookingCharge } = slabData
             const slabSettingId = randomBytes(4).toString('hex')
             const income = (interest * amount) / 100
-            let slotCalculator = 1 / ((percent * 1) / 100)
-            const slabDetails = await slabModel.findOne()
-            const slot = parseInt(slabDetails.freeSlab * slotCalculator)
+            // let slotCalculator = 1 / ((percent * 1) / 100)
+            // const slabDetails = await slabModel.findOne()
+            // const slot = parseInt(slabDetails.freeSlab * slotCalculator)
             // console.log("=========", slot);
-            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slot, slotBookingCharge })
+            return responseFormater(true, "", { slabSettingId, amount, percent, interest, locking, income, slotBookingCharge })
         }
         catch (error) {
             // console.log(error.message);
