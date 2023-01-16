@@ -48,6 +48,12 @@ exports.addSlabSetting = async (slabData) => {
 exports.getAllSlabSetting = async () => {
     try {
         const slabSettingList = await slabSettingModel.find().select("-_id -__v")
+        for (const slabData of slabSettingList) {
+            let slotCalculator = 1 / ((slabData.percent * 1) / 100)
+            const slabDetails = await slabModel.findOne()
+            const slot = parseInt(slabDetails.freeSlab * slotCalculator)
+            slabData.slot = slot
+        }
         return slabSettingList[0] ? responseFormater(true, "Setting list", slabSettingList) : responseFormater(false, "No setting added")
     } catch (error) {
         return responseFormater(false, error.message)

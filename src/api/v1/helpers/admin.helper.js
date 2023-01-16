@@ -104,3 +104,17 @@ exports.updateSlabSetting = async (slabSettingId, updatedData) => {
         return responseFormater(false, error.message)
     }
 }
+
+
+// exports.settlementInBalance = async (req, res) => {
+//     try {
+//         const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
+//         if (balanceList) {
+//             for (const balanceData of balanceList) {
+//                 const customId = balanceList[balanceData].customId
+//             }
+//         }
+//     } catch (error) {
+        
+//     }
+// }
