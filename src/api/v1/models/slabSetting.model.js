@@ -27,10 +27,6 @@ const slabSettingSchema = new Schema({
         type: Number,
         required: [true, "please provide locking"]
     },
-    slot: {
-        type: Number,
-        required: [true, "please provide slot"]
-    },
     slotBookingCharge: {
         type: Number,
         required: [true, "please provide booking charge"]
