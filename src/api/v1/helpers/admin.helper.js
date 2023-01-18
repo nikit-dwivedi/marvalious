@@ -2,6 +2,9 @@ const { adminFormatter, slabSettingFormatter } = require("../formatter/data.form
 const { responseFormater } = require("../formatter/response.format")
 const { generateAdminToken } = require("../middlewares/authToken")
 const adminModel = require("../models/admin.model")
+const balanceModel = require("../models/balance.model")
+const bankModel = require("../models/bank.model")
+const kycModel = require("../models/kyc.model")
 const slabModel = require("../models/slab.model")
 const slabSettingModel = require("../models/slabSetting.model")
 
@@ -106,15 +109,32 @@ exports.updateSlabSetting = async (slabSettingId, updatedData) => {
 }
 
 
-// exports.settlementInBalance = async (req, res) => {
-//     try {
-//         const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
-//         if (balanceList) {
-//             for (const balanceData of balanceList) {
-//                 const customId = balanceList[balanceData].customId
-//             }
-//         }
-//     } catch (error) {
+exports.settlementInBalance = async () => {
+    try {
+        const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
+        if (balanceList) {
+            for (const balanceData of balanceList) {
+                const customId = balanceList[balanceData].customId
+                const bankData = await bankModel.findOne({ customId })
+                if (bankData) {
+                    const kycDetail = await kycModel.find({ isVerified: true }, { customId })
+                    if (kycDetail) {
+                        const data = {
+                            customId: balanceList[i].customId,
+                            amount: parseInt(balanceList[i].profit)
+                        }
+                        const settlementData = new settlementModel(data)
+                        formattedData = await settlementData.save()
+                        const balanceDetails = await balanceModel.findOne({ customId })
+                        const profit = 0
+                        balanceDetails.profit = profit
+                        await balanceDetails.save()
+                    }
+                }
+            }
+            
+        }
+    } catch (error) {
         
-//     }
-// }
+    }
+}
