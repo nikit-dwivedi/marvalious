@@ -1,7 +1,7 @@
-const express = require("express");
-const router = express.Router();
+    const express = require("express");
+    const router = express.Router();
 
-require("../v1/config/mongodb");
+    require("../v1/config/mongodb");
 
 
 const newAuthRoute = require('./routes/newAuth.route')

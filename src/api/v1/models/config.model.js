@@ -7,7 +7,7 @@ const configSchema = new mongoose.Schema({
     version: {
         type: String,
     },
-    tittle: {
+    title: {
         type: String
     },
     message: {
