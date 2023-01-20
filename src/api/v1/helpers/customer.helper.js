@@ -12,8 +12,7 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
         const userCheck = await customerModel.findOne({ userId: userId })
             if (userCheck) {
                 return { status: false, message: "customer already onboarded" }
-            }
-
+            }   
         const formattedData = customerFormatter(userId, phone, bodyData);
         const token = generateUserToken(formattedData)
         const saveData = new customerModel(formattedData);

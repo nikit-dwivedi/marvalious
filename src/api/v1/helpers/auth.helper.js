@@ -20,7 +20,7 @@ exports.addAuth = async (phone) => {
 }
 exports.checkAuthByPhone = async (phone) => {
     try {
-        const authData = await authModel.exists({ phone });
+        const authData = await newAuthModel.exists({ phone });
         return authData ? authData : false;
     } catch (error) {
         return false

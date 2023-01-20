@@ -53,7 +53,7 @@ exports.editRigs = async (req, res) => {
             const freeSlab = req.body.freeSlab
             if (totalSlab) {
                 rigData.totalSlab = totalSlab
-            } 
+            }
             if (freeSlab) {
                 rigData.freeSlab = freeSlab
             }
@@ -91,7 +91,7 @@ exports.getAllRigSetting = async (req, res) => {
                 "locking": slabData.locking,
                 "slotBookingCharge": slabData.slotBookingCharge,
                 "slot": slot
-            })   
+            })
         }
         return settingList[0] ? success(res, "here is the rig settings", settingList) : badRequest(res, "rig setting not found")
     } catch (error) {
@@ -277,13 +277,23 @@ exports.editBalance = async (req, res) => {
 exports.getKycById = async (req, res) => {
     try {
         const customId = req.params.customId
-        const kycData = await kycModel.findOne({ customId })
-        const nomineeData = await nomineeModel.findOne({ customId })
+        const kycData = await kycModel.findOne({ customId }).select("-_id -__v")
+        const nomineeData = await nomineeModel.findOne({ customId }).select("-_id -__v")
         const data = {
-            kyc: kycData,
-            nominee: nomineeData
+            customId: kycData.customId,
+            name: kycData.name,
+            occupation: kycData.occupation,
+            selfie: kycData.selfie,
+            aadhaarNumber: kycData.aadhaarNumber,
+            aadhaarFront: kycData.aadhaarFront,
+            aadhaarBack: kycData.aadhaarBack,
+            panNumber: kycData.panNumber,
+            panFront: kycData.panFront,
+            nomineeName: nomineeData.nomineeName,
+            nomineeRelation: nomineeData.nomineeRelation,
+            nomineeAadhaarNo: nomineeData.nomineeAadhaarNo
         }
-        if (data.kyc && data.nominee) {
+        if (kycData && nomineeData) {
             return success(res, "here is the kyc and nominee details", data)
         } else {
             return badRequest(res, "details not found")
@@ -350,7 +360,7 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
                         const kycDetail = await kycModel.findOne({ isVerified: true }, { customId })
                         if (kycDetail) {
                             const data = {
-                                customId:customId,
+                                customId: customId,
                                 amount: parseInt(balanceData.profit)
                             }
                             const settlementData = new settlementModel(data)
@@ -447,7 +457,7 @@ exports.DailyRoi = async (req, res) => {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
         await roiPartnership(newdate)
-        return success (res, "Roi is created")
+        return success(res, "Roi is created")
     } catch (error) {
         console.log(error);
         return badRequest(res, "something went wrong")
@@ -456,19 +466,19 @@ exports.DailyRoi = async (req, res) => {
 
 exports.addConfig = async (req, res) => {
     try {
-      let configData = await configModel.findOne()
+        let configData = await configModel.findOne()
         if (configData) {
-            const version = req.body.version    
+            const version = req.body.version
             const tittle = req.body.tittle
             const message = req.body.message
             if (version) {
-                configData.version = version                
-            } 
+                configData.version = version
+            }
             if (tittle) {
-                configData.tittle = tittle  
+                configData.tittle = tittle
             }
             if (message) {
-                configData.messgae = message 
+                configData.messgae = message
             }
         } else {
             const data = {
@@ -476,8 +486,8 @@ exports.addConfig = async (req, res) => {
                 tittle: req.body.tittle,
                 message: req.body.message
             }
-             configData = new configModel(data)
-            }
+            configData = new configModel(data)
+        }
         const formattedData = await configData.save()
         return formattedData ? success(res, "configuaration added") : badRequest("cannot added config")
     } catch (error) {
@@ -489,7 +499,7 @@ exports.addConfig = async (req, res) => {
 exports.getConfig = async (req, res) => {
     try {
         const configData = await configModel.findOne()
-        return configData ? success(res, "config details" , configData): badRequest(res, "config details cannot found")
+        return configData ? success(res, "config details", configData) : badRequest(res, "config details cannot found")
     } catch (error) {
         console.log(error.message);
         return badRequest(res, "Something went wrong")
@@ -526,8 +536,8 @@ exports.createBookingByAdmin = async (req, res) => {
 exports.getAllBooking = async (req, res) => {
     try {
         const customId = req.params.customId
-        const bookingList = await bookingModel.find({customId})
-        return bookingList[0] ? success(res, "booking details", bookingList ):badRequest(res, "booking cannot be found")
+        const bookingList = await bookingModel.find({ customId })
+        return bookingList[0] ? success(res, "booking details", bookingList) : badRequest(res, "booking cannot be found")
     } catch (error) {
         console.log(error);
         return badRequest(res, "Something went wrong")
@@ -581,7 +591,7 @@ exports.purchaseBooking = async (req, res) => {
 exports.totalInvestedAmount = async (req, res) => {
     try {
         const totalInvestedAmount = await partnerModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$slabInfo.amount" } } }])
-        return totalInvestedAmount[0] ? success(res, "total invested amount", totalInvestedAmount[0]) : badRequest(res, "invested amount not found")    
+        return totalInvestedAmount[0] ? success(res, "total invested amount", totalInvestedAmount[0]) : badRequest(res, "invested amount not found")
     } catch (error) {
         console.log(error);
         return badRequest(res, "Something went wrong")
@@ -591,7 +601,7 @@ exports.totalInvestedAmount = async (req, res) => {
 exports.totalBookingAmount = async (req, res) => {
     try {
         const totalBookingAmount = await bookingModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
-        return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]):badRequest(res, "booking amount not found")
+        return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]) : badRequest(res, "booking amount not found")
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
