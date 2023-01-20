@@ -10,9 +10,9 @@ const newAuthModel = require('../models/newAuth.model')
 exports.onboardCustomer = async (userId, phone, bodyData) => {
     try {
         const userCheck = await customerModel.findOne({ userId: userId })
-        if (userCheck) {
-            return { status: false, message: "customer already onboarded" }
-        }
+            if (userCheck) {
+                return { status: false, message: "customer already onboarded" }
+            }
 
         const formattedData = customerFormatter(userId, phone, bodyData);
         const token = generateUserToken(formattedData)

@@ -15,7 +15,8 @@ const kycModel = require("../models/kyc.model");
 const bankModel = require("../models/bank.model");
 const settlementModel = require("../models/settlement.model")
 const { roiPartnership } = require("../helpers/Roi.helper")
-const configModel = require('../models/config.model')
+const configModel = require('../models/config.model');
+const { nomineeModel } = require("../models/nominee.model");
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -217,7 +218,6 @@ exports.editKycVerified = async (req, res) => {
 exports.getAllKyc = async (req, res) => {
     try {
         let isVerified = req.body.isVerified
-
         if (isVerified == true) {
             const kycDetails = await kycModel.find({ isVerified: true })
             return kycDetails[0] ? success(res, "here is the kyc details", kycDetails) : badRequest(res, "kyc details not found")
@@ -278,8 +278,18 @@ exports.getKycById = async (req, res) => {
     try {
         const customId = req.params.customId
         const kycData = await kycModel.findOne({ customId })
-        return kycData ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc cannot found")
+        const nomineeData = await nomineeModel.findOne({ customId })
+        const data = {
+            kyc: kycData,
+            nominee: nomineeData
+        }
+        if (data.kyc && data.nominee) {
+            return success(res, "here is the kyc and nominee details", data)
+        } else {
+            return badRequest(res, "details not found")
+        }
     } catch (error) {
+        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -331,22 +341,25 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
         const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
         let formattedData;
         if (balanceList) {
-            for (i = 0; i < balanceList.length; i++) {
-                const customId = balanceList[i].customId
-                const bankData = await bankModel.findOne({ customId })
-                if (bankData) {
-                    const kycDetail = await kycModel.find({ isVerified: true }, { customId })
-                    if (kycDetail) {
-                        const data = {
-                            customId: balanceList[i].customId,
-                            amount: parseInt(balanceList[i].profit)
+            for (const balanceData of balanceList) {
+                const customId = balanceData.customId
+                const partnerData = await partnerModel.findOne({ isActive: true }, { customId })
+                if (partnerData) {
+                    const bankData = await bankModel.findOne({ customId })
+                    if (bankData) {
+                        const kycDetail = await kycModel.findOne({ isVerified: true }, { customId })
+                        if (kycDetail) {
+                            const data = {
+                                customId:customId,
+                                amount: parseInt(balanceData.profit)
+                            }
+                            const settlementData = new settlementModel(data)
+                            formattedData = await settlementData.save()
+                            const balanceDetails = await balanceModel.findOne({ customId })
+                            const profit = 0
+                            balanceDetails.profit = profit
+                            await balanceDetails.save()
                         }
-                        const settlementData = new settlementModel(data)
-                        formattedData = await settlementData.save()
-                        const balanceDetails = await balanceModel.findOne({ customId })
-                        const profit = 0
-                        balanceDetails.profit = profit
-                        await balanceDetails.save()                 
                     }
                 }
             }
@@ -433,7 +446,7 @@ exports.DailyRoi = async (req, res) => {
     try {
         const currentDate = new Date().getTime() - (5 * 24 * 60 * 60 * 1000)
         let newdate = new Date(currentDate)
-        await roiPartnership()
+        await roiPartnership(newdate)
         return success (res, "Roi is created")
     } catch (error) {
         console.log(error);
@@ -445,7 +458,7 @@ exports.addConfig = async (req, res) => {
     try {
       let configData = await configModel.findOne()
         if (configData) {
-            const version = req.body.version
+            const version = req.body.version    
             const tittle = req.body.tittle
             const message = req.body.message
             if (version) {
@@ -568,7 +581,7 @@ exports.purchaseBooking = async (req, res) => {
 exports.totalInvestedAmount = async (req, res) => {
     try {
         const totalInvestedAmount = await partnerModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$slabInfo.amount" } } }])
-        return totalInvestedAmount ? success(res, "total invested amount", totalInvestedAmount) : badRequest(res, "invested amount not found")    
+        return totalInvestedAmount[0] ? success(res, "total invested amount", totalInvestedAmount[0]) : badRequest(res, "invested amount not found")    
     } catch (error) {
         console.log(error);
         return badRequest(res, "Something went wrong")
@@ -578,7 +591,7 @@ exports.totalInvestedAmount = async (req, res) => {
 exports.totalBookingAmount = async (req, res) => {
     try {
         const totalBookingAmount = await bookingModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
-        return totalBookingAmount ? success(res, "total booking amount", totalBookingAmount):badRequest(res, "booking amount not found")
+        return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]):badRequest(res, "booking amount not found")
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
