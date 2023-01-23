@@ -591,12 +591,12 @@ exports.purchaseBooking = async (req, res) => {
 exports.bookingRejectedByAdmin = async (req, res) => {
     try {
         const customId = req.params.customId 
-        const id = req.params.bookingId
-        const bookingData = await bookingModel.findById(id)
+        const _id = req.body._id
+        const bookingData = await bookingModel.findById(_id)
         if (bookingData) {
             bookingData.isRejected = true
             await bookingData.save()
-            const balanceData = await balanceModel.findOne({ customId })
+            const balanceData = await balanceModel.findOne({ customId })    
             if (balanceData) {
                 const profit = bookingData.bookingAmount * 90 / 100
                 balanceData.profit = balanceData.profit + profit
@@ -610,7 +610,6 @@ exports.bookingRejectedByAdmin = async (req, res) => {
                 amount: profit
             }
             const transaction = new transactionModel(data)
-            console.log(transaction);
             await transaction.save()
             return success(res, "booking withdraw")
         }
