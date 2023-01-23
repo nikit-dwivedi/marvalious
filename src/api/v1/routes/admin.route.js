@@ -31,7 +31,7 @@ router.get('/allconfig', getConfig)
 router.post('/booking/:customId', createBookingByAdmin)
 router.get('/allBookings/:customId', getAllBooking)
 router.post('/purchaseBooking/:customId', purchaseBooking)
-router.post('/rejected/:bookingId', bookingRejectedByAdmin )
+router.post('/rejected/:customId', bookingRejectedByAdmin )
 router.get('/partnershipAmount', totalInvestedAmount)
 router.get('/bookingAmount', totalBookingAmount)
 
