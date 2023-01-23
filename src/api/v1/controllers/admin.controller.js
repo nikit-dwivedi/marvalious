@@ -550,10 +550,10 @@ exports.purchaseBooking = async (req, res) => {
     try {
         const customId = req.params.customId
         const _id = req.body._id
-        const bookingData = await bookingModel.findOne({ _id })
-        if (bookingData) {
-            bookingData.isRejected = true
-            await bookingData.save()
+        // const bookingData = await bookingModel.findOneAndUpdate({ _id }, { isPurchased: true })
+
+            // bookingData.isRejected = true
+            // await bookingData.save()
             const rigSettingId = req.body.rigSettingId
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
@@ -573,7 +573,7 @@ exports.purchaseBooking = async (req, res) => {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
                     await new balanceModel(balanceData).save()
                 }
-                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                await bookingModel.findOneAndUpdate({ _id }, { isPurchased: true })
                 const data = {
                     customId: customId,
                     type: "Invested",
@@ -583,7 +583,7 @@ exports.purchaseBooking = async (req, res) => {
                 await transaction.save()
             }
             return success(res, message)
-        }
+        
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
