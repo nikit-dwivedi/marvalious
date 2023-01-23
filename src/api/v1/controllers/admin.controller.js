@@ -51,16 +51,17 @@ exports.editRigs = async (req, res) => {
         if (rigData) {
             const totalSlab = req.body.totalSlab
             const freeSlab = req.body.freeSlab
-            if (totalSlab) {
+            if (!(typeof totalSlab === undefined)) {
                 rigData.totalSlab = totalSlab
             }
-            if (freeSlab) {
+            if (!(typeof freeSlab=== undefined)) {
                 rigData.freeSlab = freeSlab
             }
             rigData.bookedSlab = 0
             await rigData.save()
         }
     } catch (error) {
+        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -476,10 +477,10 @@ exports.addConfig = async (req, res) => {
                 configData.version = version
             }
             if (tittle) {
-                configData.tittle = tittle
+                configData.title = tittle
             }
             if (message) {
-                configData.messgae = message
+                configData.message = message
             }
         } else {
             const data = {
@@ -587,7 +588,36 @@ exports.purchaseBooking = async (req, res) => {
         return badRequest(res, "Something went wrong")
     }
 }
-
+exports.bookingRejectedByAdmin = async (req, res) => {
+    try {
+        const customId = req.params.customId 
+        const id = req.params.bookingId
+        const bookingData = await bookingModel.findById(id)
+        if (bookingData) {
+            bookingData.isRejected = true
+            await bookingData.save()
+            const balanceData = await balanceModel.findOne({ customId })
+            if (balanceData) {
+                const profit = bookingData.bookingAmount * 90 / 100
+                balanceData.profit = balanceData.profit + profit
+                await balanceData.save()
+            }
+            const profit = bookingData.bookingAmount * 90 / 100
+            let type = 'Booking Settled'
+            const data = {
+                customId: customId,
+                type: type,
+                amount: profit
+            }
+            const transaction = new transactionModel(data)
+            console.log(transaction);
+            await transaction.save()
+            return success(res, "booking withdraw")
+        }
+    } catch (error) {
+        
+    }
+}
 
 exports.totalInvestedAmount = async (req, res) => {
     try {
