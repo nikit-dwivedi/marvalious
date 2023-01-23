@@ -244,7 +244,7 @@ exports.getBalanceUser = async (req, res) => {
 
 exports.allBalance = async (req, res) => {
     try {
-        const balanceDetails = await balanceModel.find()
+        const balanceDetails = await balanceModel.find().select("-_id -__v")
         return balanceDetails[0] ? success(res, "balance details", balanceDetails) : badRequest(res, "balance not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
@@ -412,9 +412,10 @@ exports.editSettlement = async (req, res) => {
 exports.kycDelete = async (req, res) => {
     try {
         const customId = req.params.customId
-        const kycDetails = await kycModel.findByIdAndDelete(customId)
+        const kycDetails = await kycModel.findOneAndDelete(customId)
         return kycDetails ? success(res, "kyc deleted") : badRequest(res, "bank cannot be deleted")
     } catch (error) {
+        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
