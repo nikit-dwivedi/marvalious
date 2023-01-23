@@ -7,7 +7,7 @@ const partnerSchema = new Schema({
         unique: true,
         required: true
     },
-    customId: {
+    customId: { 
         type: String,
         required: true
     },
