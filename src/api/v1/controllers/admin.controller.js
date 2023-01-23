@@ -76,7 +76,7 @@ exports.addRigSetting = async (req, res) => {
 
 exports.getAllRigSetting = async (req, res) => {
     try {
-        const slabSettingList = await slabSettingModel.find().select("-_id -__v")
+        const slabSettingList = await slabSettingModel.find().select("-_id -__v").sort()
         let settingList = []
         for (const slabData of slabSettingList) {
             let slotCalculator = 1 / ((slabData.percent * 1) / 100)
