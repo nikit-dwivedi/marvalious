@@ -184,7 +184,7 @@ exports.addPartnershipByAdmin = async (req, res) => {
             }
             // await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
             const data = {
-                customId: token.customId,
+                customId: customId,
                 type: "Invested",
                 amount: rigData.amount
             }
@@ -543,7 +543,7 @@ exports.createBookingByAdmin = async (req, res) => {
 exports.getAllBooking = async (req, res) => {
     try {
         const customId = req.params.customId
-        const bookingList = await bookingModel.find({ customId, isPurchased:false })
+        const bookingList = await bookingModel.find({ customId, isPurchased: false })
         return bookingList[0] ? success(res, "booking details", bookingList) : badRequest(res, "booking cannot be found")
     } catch (error) {
         console.log(error);
@@ -574,7 +574,7 @@ exports.purchaseBooking = async (req, res) => {
                 balanceData.investAmount = balanceData.investAmount + rigData.amount
                 await balanceData.save()
             }
-            await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
+            await bookingModel.findOneAndUpdate({ _id: bookingId }, { isPurchased: true })
             const data = {
                 customId: customId,
                 type: "Invested",
