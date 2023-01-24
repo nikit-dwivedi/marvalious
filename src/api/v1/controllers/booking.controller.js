@@ -135,7 +135,7 @@ const purchaseBooking = async (req, res) => {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
                     await balanceData.save()
                 }
-                await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
+                await bookingModel.findOneAndUpdate({ _id: bookingId }, { isPurchased: true })
                 const data = {
                     customId: token.customId,
                     type: "Invested",
