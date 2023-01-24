@@ -49,16 +49,18 @@ exports.editRigs = async (req, res) => {
     try {
         const rigData = await slabModel.findOne()
         if (rigData) {
-            const totalSlab = req.body.totalSlab
-            const freeSlab = req.body.freeSlab
-            if (!(typeof totalSlab === undefined)) {
-                rigData.totalSlab = totalSlab
+            const numberOfRig = req.body.numberOfRig
+            console.log(typeof numberOfRig);
+
+            if (!(typeof numberOfRig === "undefined")) {             
+                rigData.totalSlab = numberOfRig
+                rigData.freeSlab = numberOfRig
+                rigData.bookedSlab = 0
+                await rigData.save()
+                return rigData? success(res, "rig edited"):badRequest(res, "rigs cannot be edited")
+            } else {
+                return badRequest(res , "invalid input")
             }
-            if (!(typeof freeSlab === undefined)) {
-                rigData.freeSlab = freeSlab
-            }
-            rigData.bookedSlab = 0
-            await rigData.save()
         }
     } catch (error) {
         console.log(error);
