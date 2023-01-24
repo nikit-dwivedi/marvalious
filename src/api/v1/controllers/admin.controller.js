@@ -54,7 +54,7 @@ exports.editRigs = async (req, res) => {
             if (!(typeof totalSlab === undefined)) {
                 rigData.totalSlab = totalSlab
             }
-            if (!(typeof freeSlab=== undefined)) {
+            if (!(typeof freeSlab === undefined)) {
                 rigData.freeSlab = freeSlab
             }
             rigData.bookedSlab = 0
@@ -177,11 +177,11 @@ exports.addPartnershipByAdmin = async (req, res) => {
         }
         if (addPartner) {
             const rigId = rigSettingId
-            const balanceData = await balanceModel.findOne({ customId})
+            const balanceData = await balanceModel.findOne({ customId })
             if (balanceData) {
                 balanceData.investAmount = balanceData.investAmount + rigData.amount
                 await balanceData.save()
-            } 
+            }
             // await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
             const data = {
                 customId: token.customId,
@@ -543,7 +543,7 @@ exports.createBookingByAdmin = async (req, res) => {
 exports.getAllBooking = async (req, res) => {
     try {
         const customId = req.params.customId
-        const bookingList = await bookingModel.find({ customId })
+        const bookingList = await bookingModel.find({ customId, isPurchased:false })
         return bookingList[0] ? success(res, "booking details", bookingList) : badRequest(res, "booking cannot be found")
     } catch (error) {
         console.log(error);
@@ -555,35 +555,35 @@ exports.purchaseBooking = async (req, res) => {
     try {
         const customId = req.params.customId
         const bookingId = req.body._id
-            const rigSettingId = req.body.rigSettingId
-            const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
-            if (!rigStatus) {
-                return badRequest(res, rigMessage)
+        const rigSettingId = req.body.rigSettingId
+        const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
+        if (!rigStatus) {
+            return badRequest(res, rigMessage)
+        }
+        const { status, message } = await addPartner(customId, rigData)
+        if (!status) {
+            return badRequest(res, message)
+        }
+        if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
+            await changeSlabToBooked()
+        }
+        if (addPartner) {
+            // const rigId = rigSettingId
+            const balanceData = await balanceModel.findOne({ customId: customId })
+            if (balanceData) {
+                balanceData.investAmount = balanceData.investAmount + rigData.amount
+                await balanceData.save()
             }
-            const { status, message } = await addPartner(customId, rigData)
-            if (!status) {
-                return badRequest(res, message)
+            await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
+            const data = {
+                customId: customId,
+                type: "Invested",
+                amount: rigData.amount
             }
-            if ((rigData._doc.availableSlot + 1) % rigData.slot == 0) {
-                await changeSlabToBooked()
-            }
-            if (addPartner) {
-                // const rigId = rigSettingId
-                const balanceData = await balanceModel.findOne({ customId: customId })
-                if (balanceData) {
-                    balanceData.investAmount = balanceData.investAmount + rigData.amount
-                    await balanceData.save()
-                }
-                await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
-                const data = {
-                    customId: customId,
-                    type: "Invested",
-                    amount: rigData.amount
-                }
-                const transaction = new transactionModel(data)
-                await transaction.save()
-            }
-            return success(res, message)     
+            const transaction = new transactionModel(data)
+            await transaction.save()
+        }
+        return success(res, message)
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
@@ -591,13 +591,13 @@ exports.purchaseBooking = async (req, res) => {
 
 exports.bookingRejectedByAdmin = async (req, res) => {
     try {
-        const customId = req.params.customId 
+        const customId = req.params.customId
         const _id = req.body._id
         const bookingData = await bookingModel.findById(_id)
         if (bookingData) {
             bookingData.isRejected = true
             await bookingData.save()
-            const balanceData = await balanceModel.findOne({ customId })    
+            const balanceData = await balanceModel.findOne({ customId })
             if (balanceData) {
                 const profit = bookingData.bookingAmount * 90 / 100
                 balanceData.profit = balanceData.profit + profit
@@ -615,7 +615,7 @@ exports.bookingRejectedByAdmin = async (req, res) => {
             return success(res, "booking withdraw")
         }
     } catch (error) {
-        
+
     }
 }
 
