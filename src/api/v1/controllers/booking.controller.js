@@ -114,12 +114,8 @@ const bookingRejected = async (req, res) => {
 
 const purchaseBooking = async (req, res) => {
     try {
-        const _id = req.body._id
-        const bookingData = await bookingModel.findOne({ _id })
-        if (bookingData) {
-            bookingData.isRejected = true
-            await bookingData.save()
-            const rigSettingId = req.body.rigSettingId
+        const rigSettingId = req.body.rigSettingId
+        const bookingId = req.body._id
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
                 return badRequest(res, rigMessage)
@@ -133,13 +129,13 @@ const purchaseBooking = async (req, res) => {
                 await changeSlabToBooked()
             }
             if (addPartner) {
-                const rigId = rigSettingId
+                // const rigId = rigSettingId
                 const balanceData = await balanceModel.findOne({ customId: token.customId })
                 if (balanceData) {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
-                    await new balanceModel(balanceData).save()
+                    await balanceData.save()
                 }
-                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
                 const data = {
                     customId: token.customId,
                     type: "Invested",
@@ -149,7 +145,7 @@ const purchaseBooking = async (req, res) => {
                 await transaction.save()
             }
             return success(res, message)
-        }
+        
     } catch (error) {
         return badRequest(res, "something went wrong")
     }

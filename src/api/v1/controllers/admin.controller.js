@@ -177,7 +177,12 @@ exports.addPartnershipByAdmin = async (req, res) => {
         }
         if (addPartner) {
             const rigId = rigSettingId
-            await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+            const balanceData = await balanceModel.findOne({ customId})
+            if (balanceData) {
+                balanceData.investAmount = balanceData.investAmount + rigData.amount
+                await balanceData.save()
+            } 
+            // await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
             const data = {
                 customId: token.customId,
                 type: "Invested",
@@ -549,11 +554,7 @@ exports.getAllBooking = async (req, res) => {
 exports.purchaseBooking = async (req, res) => {
     try {
         const customId = req.params.customId
-        const _id = req.body._id
-        // const bookingData = await bookingModel.findOneAndUpdate({ _id }, { isPurchased: true })
-
-            // bookingData.isRejected = true
-            // await bookingData.save()
+        const bookingId = req.body._id
             const rigSettingId = req.body.rigSettingId
             const { status: rigStatus, message: rigMessage, data: rigData } = await getSlabSettingById(rigSettingId)
             if (!rigStatus) {
@@ -567,13 +568,13 @@ exports.purchaseBooking = async (req, res) => {
                 await changeSlabToBooked()
             }
             if (addPartner) {
-                const rigId = rigSettingId
+                // const rigId = rigSettingId
                 const balanceData = await balanceModel.findOne({ customId: customId })
                 if (balanceData) {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
-                    await new balanceModel(balanceData).save()
+                    await balanceData.save()
                 }
-                await bookingModel.findOneAndUpdate({ _id }, { isPurchased: true })
+                await bookingModel.findOneAndUpdate({ bookingId }, { isPurchased: true })
                 const data = {
                     customId: customId,
                     type: "Invested",
@@ -582,12 +583,12 @@ exports.purchaseBooking = async (req, res) => {
                 const transaction = new transactionModel(data)
                 await transaction.save()
             }
-            return success(res, message)
-        
+            return success(res, message)     
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
 }
+
 exports.bookingRejectedByAdmin = async (req, res) => {
     try {
         const customId = req.params.customId 

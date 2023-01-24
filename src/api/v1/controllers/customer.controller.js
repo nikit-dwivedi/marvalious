@@ -192,9 +192,9 @@ module.exports = {
                 const balanceData = await balanceModel.findOne({ customId: token.customId })
                 if (balanceData) {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
-                    await new balanceModel(balanceData).save()
-                }
-                await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
+                    await balanceData.save()
+                } 
+                // await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
                 const data = {
                     customId: token.customId,
                     type: "Invested",
