@@ -176,7 +176,7 @@ exports.addPartnershipByAdmin = async (req, res) => {
             await changeSlabToBooked()
         }
         if (addPartner) {
-            const rigId = rigSettingId
+            // const rigId = rigSettingId
             const balanceData = await balanceModel.findOne({ customId })
             if (balanceData) {
                 balanceData.investAmount = balanceData.investAmount + rigData.amount
