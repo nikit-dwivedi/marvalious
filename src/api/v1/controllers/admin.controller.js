@@ -286,22 +286,23 @@ exports.getKycById = async (req, res) => {
     try {
         const customId = req.params.customId
         const kycData = await kycModel.findOne({ customId }).select("-_id -__v")
-        const nomineeData = await nomineeModel.findOne({ customId }).select("-_id -__v")
-        const data = {
-            customId: kycData.customId,
-            name: kycData.name,
-            occupation: kycData.occupation,
-            selfie: kycData.selfie,
-            aadhaarNumber: kycData.aadhaarNumber,
-            aadhaarFront: kycData.aadhaarFront,
-            aadhaarBack: kycData.aadhaarBack,
-            panNumber: kycData.panNumber,
-            panFront: kycData.panFront,
-            nomineeName: nomineeData.nomineeName,
-            nomineeRelation: nomineeData.nomineeRelation,
-            nomineeAadhaarNo: nomineeData.nomineeAadhaarNo
-        }
+        const nomineeData = await nomineeModel.findOne({ customerId:customId }).select("-_id -__v")
+        
         if (kycData && nomineeData) {
+            const data = {
+                customId: kycData.customId,
+                name: kycData.name,
+                occupation: kycData.occupation,
+                selfie: kycData.selfie,
+                aadhaarNumber: kycData.aadhaarNumber,
+                aadhaarFront: kycData.aadhaarFront,
+                aadhaarBack: kycData.aadhaarBack,
+                panNumber: kycData.panNumber,
+                panFront: kycData.panFront,
+                nomineeName: nomineeData.nomineeName,
+                nomineeRelation: nomineeData.nomineeRelation,
+                nomineeAadhaarNo: nomineeData.nomineeAadhaarNo
+            }
             return success(res, "here is the kyc and nominee details", data)
         } else {
             return badRequest(res, "details not found")
@@ -420,8 +421,10 @@ exports.editSettlement = async (req, res) => {
 exports.kycDelete = async (req, res) => {
     try {
         const customId = req.params.customId
-        const kycDetails = await kycModel.findOneAndDelete(customId)
-        return kycDetails ? success(res, "kyc deleted") : badRequest(res, "bank cannot be deleted")
+        const kycDetails = await kycModel.findOneAndDelete({customId:customId})
+        const nomineeDetails = await nomineeModel.findOneAndDelete({customerId:customId})
+      
+        return  success(res, "kyc deleted") 
     } catch (error) {
         console.log(error);
         return badRequest(res, "something went wrong")
