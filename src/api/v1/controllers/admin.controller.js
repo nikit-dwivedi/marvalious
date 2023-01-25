@@ -52,8 +52,6 @@ exports.editRigs = async (req, res) => {
         const rigData = await slabModel.findOne()
         if (rigData) {
             const numberOfRig = req.body.numberOfRig
-            console.log(typeof numberOfRig);
-
             if (!(typeof numberOfRig === "undefined")) {
                 rigData.totalSlab = numberOfRig
                 rigData.freeSlab = numberOfRig
@@ -65,7 +63,6 @@ exports.editRigs = async (req, res) => {
             }
         }
     } catch (error) {
-        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -141,7 +138,6 @@ exports.editRigSetting = async (req, res) => {
             rigData ? success(res, "rig setting updated") : badRequest(res, "rig setting cannot be updated")
         }
     } catch (error) {
-        console.log(error.message);
         return badRequest(res, "something went wrong")
     }
 }
@@ -243,7 +239,6 @@ exports.getAllKyc = async (req, res) => {
             return kycData[0] ? success(res, "here is the kyc details", kycData) : badRequest(res, "kyc details not found")
         }
     } catch (error) {
-        console.log(error.message);
         return badRequest(res, "something went  wrong")
     }
 }
@@ -254,8 +249,7 @@ exports.getBalanceUser = async (req, res) => {
         const balanceDetails = await balanceModel.findOne({ customId })
         return balanceDetails ? success(res, "here is the balance", balanceDetails) : badRequest(res, "balance not found")
     } catch (error) {
-        console.log(error.message);
-        badRequest(res, "something went wrong")
+        return badRequest(res, "something went wrong")
     }
 }
 
@@ -296,7 +290,6 @@ exports.getKycById = async (req, res) => {
         const customId = req.params.customId
         const kycData = await kycModel.findOne({ customId }).select("-_id -__v")
         const nomineeData = await nomineeModel.findOne({ customerId: customId }).select("-_id -__v")
-
         if (kycData && nomineeData) {
             const data = {
                 customId: kycData.customId,
@@ -317,7 +310,6 @@ exports.getKycById = async (req, res) => {
             return badRequest(res, "details not found")
         }
     } catch (error) {
-        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -394,7 +386,6 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
             return formattedData ? success(res, "settlement created") : badRequest(res, "settlement cannot be created")
         }
     } catch (error) {
-        console.log(error.message);
         return badRequest(res, "something went wrong")
     }
 }
@@ -460,7 +451,6 @@ exports.kycDelete = async (req, res) => {
         const nomineeDetails = await nomineeModel.findOneAndDelete({ customerId: customId })
         return success(res, "kyc deleted")
     } catch (error) {
-        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -505,7 +495,6 @@ exports.DailyRoi = async (req, res) => {
         await roiPartnership(newdate)
         return success(res, "Roi is created")
     } catch (error) {
-        console.log(error);
         return badRequest(res, "something went wrong")
     }
 }
@@ -537,7 +526,6 @@ exports.addConfig = async (req, res) => {
         const formattedData = await configData.save()
         return formattedData ? success(res, "configuaration added") : badRequest("cannot added config")
     } catch (error) {
-        console.log(error.message);
         return badRequest(res, "Something went wrong")
     }
 }
@@ -547,7 +535,6 @@ exports.getConfig = async (req, res) => {
         const configData = await configModel.findOne()
         return configData ? success(res, "config details", configData) : badRequest(res, "config details cannot found")
     } catch (error) {
-        console.log(error.message);
         return badRequest(res, "Something went wrong")
     }
 }
@@ -585,7 +572,6 @@ exports.getAllBooking = async (req, res) => {
         const bookingList = await bookingModel.find({ customId, isPurchased: false })
         return bookingList[0] ? success(res, "booking details", bookingList) : badRequest(res, "booking cannot be found")
     } catch (error) {
-        console.log(error);
         return badRequest(res, "Something went wrong")
     }
 }
@@ -663,7 +649,6 @@ exports.totalInvestedAmount = async (req, res) => {
         const totalInvestedAmount = await partnerModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$slabInfo.amount" } } }])
         return totalInvestedAmount[0] ? success(res, "total invested amount", totalInvestedAmount[0]) : badRequest(res, "invested amount not found")
     } catch (error) {
-        console.log(error);
         return badRequest(res, "Something went wrong")
     }
 }
@@ -696,11 +681,10 @@ exports.convertSettlementToCSV = async (req, res) => {
                 upiId: bankData.upiId
             }
             csvData.push(bodyData)
-            data2CSV(csvData)
+            await data2CSV(csvData)
         }
         return csvData ? success(res, "converted to csv file",) : badRequest(res, "not converted to csv")
     } catch (error) {
-        console.log(error);
         return badRequest(res, "Something went wrong")
     }
 }
