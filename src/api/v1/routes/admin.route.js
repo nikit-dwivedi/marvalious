@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRigsAmount, getRigs, editRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi, addConfig, getConfig, createBookingByAdmin, getAllBooking, purchaseBooking, totalInvestedAmount, totalBookingAmount, bookingRejectedByAdmin } = require('../controllers/admin.controller');
+const { addRigsAmount, getRigs, editRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi, addConfig, getConfig, createBookingByAdmin, getAllBooking, purchaseBooking, totalInvestedAmount, totalBookingAmount, bookingRejectedByAdmin, editSettlementById, allPartnership, convertSettlementToCSV  } = require('../controllers/admin.controller');
 const router = express.Router();
 
 
@@ -11,6 +11,7 @@ router.post('/edit/setting/:slabSettingId', editRigSetting)
 router.get('/allRigSetting', getAllRigSetting)
 router.get('/allCustomers', getAllCustomer)
 router.post('/addPartner', addPartnershipByAdmin)
+router.get('/allPartners', allPartnership)
 router.get('/getBalanceUser/:customId', getBalanceUser)
 router.get('/getAllBalance', allBalance)
 router.post('/editBalance/:customId', editBalance)
@@ -24,6 +25,7 @@ router.get('/booked/rigs/:customId', getCustomerBookedRigs)
 router.get('/settlement', createSettlement)
 router.get('/allSettlements', getAllSettlement)
 router.patch('/settled', editSettlement)
+router.post('/settledById/:customId', editSettlementById)
 router.get('/kyc/fake/:customId', kycDelete)
 router.post('/dailyRoi', DailyRoi)
 router.post('/config', addConfig)
@@ -34,7 +36,7 @@ router.post('/purchaseBooking/:customId', purchaseBooking)
 router.post('/rejected/:customId', bookingRejectedByAdmin )
 router.get('/partnershipAmount', totalInvestedAmount)
 router.get('/bookingAmount', totalBookingAmount)
-
+router.get('/csv', convertSettlementToCSV)
 
 
 module.exports = router 

@@ -7,6 +7,11 @@ const bankModel = require("../models/bank.model")
 const kycModel = require("../models/kyc.model")
 const slabModel = require("../models/slab.model")
 const slabSettingModel = require("../models/slabSetting.model")
+const { Parser } = require('@json2csv/plainjs')
+const fs = require('fs')
+const {sendMail} = require('../services/otp.service')
+const { convertSettlementToCSV } = require("../controllers/admin.controller")
+
 
 exports.register = async (phone) => {
     try {
@@ -107,34 +112,21 @@ exports.updateSlabSetting = async (slabSettingId, updatedData) => {
         return responseFormater(false, error.message)
     }
 }
-
-
-exports.settlementInBalance = async () => {
+exports.data2CSV = async (data) => {
     try {
-        const balanceList = await balanceModel.find({ profit: { $gt: 0 } })
-        if (balanceList) {
-            for (const balanceData of balanceList) {
-                const customId = balanceList[balanceData].customId
-                const bankData = await bankModel.findOne({ customId })
-                if (bankData) {
-                    const kycDetail = await kycModel.find({ isVerified: true }, { customId })
-                    if (kycDetail) {
-                        const data = {
-                            customId: balanceList[i].customId,
-                            amount: parseInt(balanceList[i].profit)
-                        }
-                        const settlementData = new settlementModel(data)
-                        formattedData = await settlementData.save()
-                        const balanceDetails = await balanceModel.findOne({ customId })
-                        const profit = 0
-                        balanceDetails.profit = profit
-                        await balanceDetails.save()
-                    }
-                }
-            }
-            
-        }
+        const parser = new Parser();
+        const csv = parser.parse(data);
+        let pathToAttachment = './settlements.csv'
+        this.writeCsv(csv, pathToAttachment)
+        let attachment = fs.readFileSync(pathToAttachment).toString("base64");
+        await sendMail(attachment)
+        fs.unlinkSync('settlements.csv');
     } catch (error) {
-        
+        console.log(error);
+        console.log(error.message);
     }
+}
+
+exports.writeCsv = (data, path) => {
+    fs.writeFileSync(path, data)
 }

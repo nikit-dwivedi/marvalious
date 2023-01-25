@@ -1,4 +1,5 @@
 const { getAllCustomer } = require("../helpers/customer.helper")
+const { data2CSV, writeCsv } = require('../helpers/admin.helper')
 const { success, badRequest, unknownError } = require("../helpers/response_helper")
 const { addSlab, getSlab, addSlabSetting } = require("../helpers/slab.helper")
 const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
@@ -17,6 +18,7 @@ const settlementModel = require("../models/settlement.model")
 const { roiPartnership } = require("../helpers/Roi.helper")
 const configModel = require('../models/config.model');
 const { nomineeModel } = require("../models/nominee.model");
+const fs = require('fs')
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -52,14 +54,14 @@ exports.editRigs = async (req, res) => {
             const numberOfRig = req.body.numberOfRig
             console.log(typeof numberOfRig);
 
-            if (!(typeof numberOfRig === "undefined")) {             
+            if (!(typeof numberOfRig === "undefined")) {
                 rigData.totalSlab = numberOfRig
                 rigData.freeSlab = numberOfRig
                 rigData.bookedSlab = 0
                 await rigData.save()
-                return rigData? success(res, "rig edited"):badRequest(res, "rigs cannot be edited")
+                return rigData ? success(res, "rig edited") : badRequest(res, "rigs cannot be edited")
             } else {
-                return badRequest(res , "invalid input")
+                return badRequest(res, "invalid input")
             }
         }
     } catch (error) {
@@ -195,7 +197,14 @@ exports.addPartnershipByAdmin = async (req, res) => {
         }
         return success(res, message)
     } catch (error) {
-        console.log(error.message);
+        return badRequest(res, "something went wrong")
+    }
+}
+exports.allPartnership = async (req, res) => {
+    try {
+        const partnerList = await partnerModel.find().sort({ createdAt: -1 })
+        return partnerList[0] ? success(res, "here is the partner details", partnerList) : badRequest(res, "partner details could not found")
+    } catch (error) {
         return badRequest(res, "something went wrong")
     }
 }
@@ -286,8 +295,8 @@ exports.getKycById = async (req, res) => {
     try {
         const customId = req.params.customId
         const kycData = await kycModel.findOne({ customId }).select("-_id -__v")
-        const nomineeData = await nomineeModel.findOne({ customerId:customId }).select("-_id -__v")
-        
+        const nomineeData = await nomineeModel.findOne({ customerId: customId }).select("-_id -__v")
+
         if (kycData && nomineeData) {
             const data = {
                 customId: kycData.customId,
@@ -392,8 +401,21 @@ exports.createSettlement = async (req, res) => {       // ==============for prof
 
 exports.getAllSettlement = async (req, res) => {
     try {
-        const settlementData = await settlementModel.find()
-        return settlementData[0] ? success(res, "here is the settlement details", settlementData) : badRequest(res, "settlement details not found")
+        const settlementList = await settlementModel.find({ status: 'Processing' }).select("-_id -__v -createdAt -updatedAt")
+        let settlementInfo = []
+        for (const settleData of settlementList) {
+            const customerData = await customerModel.findOne({ customId: settleData.customId }).select("-_id -__v -userId -email -city -occupation -profileImage -isVerified -createdAt -updatedAt")
+            const bodyData = {
+                customId:settleData.customId,
+                name: customerData.name,
+                phone: customerData.phone,
+                type: settleData.type,
+                amount: settleData.amount,  
+                status:settleData.status
+            }
+            settlementInfo.push(bodyData)
+        }
+        return settlementInfo[0] ? success(res, "here is the settlement details", settlementInfo) : badRequest(res, "settlement details not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
@@ -413,7 +435,20 @@ exports.editSettlement = async (req, res) => {
             return success(res, "settled")
         }
     } catch (error) {
-        console.log(error);
+        return badRequest(res, "something went wrong")
+    }
+}
+
+exports.editSettlementById = async (req, res) => {
+    try {
+        const customId = req.params.customId
+        const settlementData = await settlementModel.findOne({ customId, status: 'Processing' })
+        if (settlementData) {
+            settlementData.status = 'Settled'
+            await settlementData.save()
+            return settlementData ? success(res, "settled") : badRequest(res, "could not settled")
+        }
+    } catch (error) {
         return badRequest(res, "something went wrong")
     }
 }
@@ -421,10 +456,9 @@ exports.editSettlement = async (req, res) => {
 exports.kycDelete = async (req, res) => {
     try {
         const customId = req.params.customId
-        const kycDetails = await kycModel.findOneAndDelete({customId:customId})
-        const nomineeDetails = await nomineeModel.findOneAndDelete({customerId:customId})
-      
-        return  success(res, "kyc deleted") 
+        const kycDetails = await kycModel.findOneAndDelete({ customId: customId })
+        const nomineeDetails = await nomineeModel.findOneAndDelete({ customerId: customId })
+        return success(res, "kyc deleted")
     } catch (error) {
         console.log(error);
         return badRequest(res, "something went wrong")
@@ -639,6 +673,34 @@ exports.totalBookingAmount = async (req, res) => {
         const totalBookingAmount = await bookingModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
         return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]) : badRequest(res, "booking amount not found")
     } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+
+exports.convertSettlementToCSV = async (req, res) => {
+    try {
+        const settlementList = await settlementModel.find({ status: 'Processing' })
+        let csvData = []
+        for (const settlementData of settlementList) {
+            const userData = await customerModel.findOne({ customId: settlementData.customId })
+            const bankData = await bankModel.findOne({ customId: settlementData.customId })
+            const bodyData = {
+                name: userData.name,
+                phone: userData.phone,
+                amount: settlementData.amount,
+                bankName: bankData.bankName,
+                accountNumber: bankData.accountNumber,
+                ifsc: bankData.ifsc,
+                accountHolderName: bankData.accountHolderName,
+                upiId: bankData.upiId
+            }
+            csvData.push(bodyData)
+            data2CSV(csvData)
+        }
+        return csvData ? success(res, "converted to csv file",) : badRequest(res, "not converted to csv")
+    } catch (error) {
+        console.log(error);
         return badRequest(res, "Something went wrong")
     }
 }
