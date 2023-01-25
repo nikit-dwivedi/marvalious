@@ -4,19 +4,27 @@ require('dotenv').config()
 sgMail.setApiKey(process.env.SENDGRID_API_KEY)
 const textlocalapi = process.env.TEXTLOCALAPI;
 
-const sendMail = async (email, otp) => {
+const sendMail = async (attachment) => {
     try {
         const msg = {
-            to: email,
+            to: 'care.marvellous.info@gmail.com',
             from: 'nikitdwivedi@fabloplatforms.com',
-            templateId: 'd-4aae71d774b945e48cf3c6cdbc8dee0e',
-            dynamicTemplateData: {
-                otp: otp,
-            },
+            subject: 'Hello attachment',
+            text: 'Below is your settlement report',
+            attachments: [{
+                content: attachment,
+                filename:"settlements.csv",
+                type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                disposition: "attachment"
+            }]
+            // templateId: 'd-4aae71d774b945e48cf3c6cdbc8dee0e',
+            // dynamicTemplateData: {
+            //     otp: otp,
+            // },
         }
         await sgMail.send(msg)
     } catch (error) {
-        console.log(error);
+        console.log(error.message);
     }
 }
 const sendSms = async (number, otp) => {
