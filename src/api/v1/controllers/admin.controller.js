@@ -153,7 +153,7 @@ exports.deleteRigSetting = async (req, res) => {
 
 exports.getAllCustomer = async (req, res) => {
     try {
-        const customerdata = await customerModel.find()
+        const customerdata = await customerModel.find().sort({ createdAt: -1 }).select("-_id -__v")
         return customerdata[0] ? success(res, "here are all the customers", customerdata) : badRequest(res, "customers not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
@@ -397,12 +397,12 @@ exports.getAllSettlement = async (req, res) => {
         for (const settleData of settlementList) {
             const customerData = await customerModel.findOne({ customId: settleData.customId }).select("-_id -__v -userId -email -city -occupation -profileImage -isVerified -createdAt -updatedAt")
             const bodyData = {
-                customId:settleData.customId,
+                customId: settleData.customId,
                 name: customerData.name,
                 phone: customerData.phone,
                 type: settleData.type,
-                amount: settleData.amount,  
-                status:settleData.status
+                amount: settleData.amount,
+                status: settleData.status
             }
             settlementInfo.push(bodyData)
         }
@@ -670,20 +670,34 @@ exports.convertSettlementToCSV = async (req, res) => {
         for (const settlementData of settlementList) {
             const userData = await customerModel.findOne({ customId: settlementData.customId })
             const bankData = await bankModel.findOne({ customId: settlementData.customId })
-            const bodyData = {
-                name: userData.name,
-                phone: userData.phone,
-                amount: settlementData.amount,
-                bankName: bankData.bankName,
-                accountNumber: bankData.accountNumber,
-                ifsc: bankData.ifsc,
-                accountHolderName: bankData.accountHolderName,
-                upiId: bankData.upiId
-            }
+            const amount = settlementData.amount
+            const { name, phone } = userData
+            const { bankName, accountNumber, ifsc, accountHolderName, upiId } = bankData
+            const bodyData = { name, phone, amount, bankName, accountNumber, ifsc, accountHolderName, upiId, }
             csvData.push(bodyData)
-            await data2CSV(csvData)
+            const path = './settlements.csv'
+            const subject = "Below is your settlement report"
+            const filename = "settlements.csv"
+            await data2CSV(csvData, path, subject, filename)
         }
         return csvData ? success(res, "converted to csv file",) : badRequest(res, "not converted to csv")
+    } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.createCustomerReport = async (req, res) => {
+    try {
+        const customerList = await customerModel.find().select("-_id -__v -userId -updatedAt -isVerified -profileImage -customerId").sort({ createdAt: -1 })
+        const newData = customerList.map((investorData) => {
+            investorData._doc.createdAt = new Date(investorData._doc.createdAt).toLocaleDateString('en-IN')
+            return investorData._doc
+        })
+        const path = "./customer.csv"
+        const subject = "Below is your customer report"
+        const filename = "customer.csv"
+        await data2CSV(newData, path, subject, filename)
+        return success(res, "converted to csv file")
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }
