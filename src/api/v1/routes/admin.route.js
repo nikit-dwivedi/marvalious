@@ -1,5 +1,5 @@
 const express = require('express');
-const { addRigsAmount, getRigs, editRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi, addConfig, getConfig, createBookingByAdmin, getAllBooking, purchaseBooking, totalInvestedAmount, totalBookingAmount, bookingRejectedByAdmin, editSettlementById, allPartnership, convertSettlementToCSV  } = require('../controllers/admin.controller');
+const { addRigsAmount, getRigs, editRigs, addRigSetting, getAllRigSetting, editRigSetting, getAllCustomer, addPartnershipByAdmin, getBalanceUser, allBalance, editBalance, editKycVerified, getAllKyc, getKycById, getBankById, getCustomerById, getCustomerPurchaseRigs, getCustomerBookedRigs, createSettlement, getAllSettlement, editSettlement, kycDelete, DailyRoi, addConfig, getConfig, createBookingByAdmin, getAllBooking, purchaseBooking, totalInvestedAmount, totalBookingAmount, bookingRejectedByAdmin, editSettlementById, allPartnership, convertSettlementToCSV, createCustomerReport  } = require('../controllers/admin.controller');
 const router = express.Router();
 
 
@@ -37,6 +37,7 @@ router.post('/rejected/:customId', bookingRejectedByAdmin )
 router.get('/partnershipAmount', totalInvestedAmount)
 router.get('/bookingAmount', totalBookingAmount)
 router.get('/csv', convertSettlementToCSV)
+router.get('/customers/csv', createCustomerReport)
 
 
 module.exports = router 

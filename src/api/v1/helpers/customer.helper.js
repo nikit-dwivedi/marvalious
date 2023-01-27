@@ -1,6 +1,7 @@
 const { customerFormatter } = require('../formatter/data.format');
 const { responseFormater } = require('../formatter/response.format');
 const { generateUserToken, parseJwt } = require('../middlewares/authToken');
+const { sendMailToAdmin } = require('../services/otp.service')
 const authModel = require('../models/auth.model');
 const customerModel = require('../models/customer.model');
 const balanceModel = require('../models/balance.model')
@@ -24,6 +25,8 @@ exports.onboardCustomer = async (userId, phone, bodyData) => {
             profit: 0
         }
         await new balanceModel(balanceData).save()
+        console.log(formattedData.name);
+        await sendMailToAdmin(formattedData.name)
         return responseFormater(true, "succesfully onboarded", { token, profileImage: saveData.profileImage, name: saveData.name , occupation: saveData.occupation })
     } catch (error) {
         console.log(error);

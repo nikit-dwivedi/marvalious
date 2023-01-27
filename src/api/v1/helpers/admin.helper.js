@@ -10,7 +10,7 @@ const slabSettingModel = require("../models/slabSetting.model")
 const { Parser } = require('@json2csv/plainjs')
 const fs = require('fs')
 const {sendMail} = require('../services/otp.service')
-const { convertSettlementToCSV } = require("../controllers/admin.controller")
+
 
 
 exports.register = async (phone) => {
@@ -112,15 +112,14 @@ exports.updateSlabSetting = async (slabSettingId, updatedData) => {
         return responseFormater(false, error.message)
     }
 }
-exports.data2CSV = async (data) => {
+exports.data2CSV = async (data, path, subject , filename) => {
     try {
         const parser = new Parser();
         const csv = parser.parse(data);
-        let pathToAttachment = './settlements.csv'
-        this.writeCsv(csv, pathToAttachment)
-        let attachment = fs.readFileSync(pathToAttachment).toString("base64");
-        await sendMail(attachment)
-        fs.unlinkSync('settlements.csv');
+        this.writeCsv(csv, path)
+        let attachment = fs.readFileSync(path).toString("base64");
+        await sendMail(attachment, subject, filename)
+        fs.unlinkSync(path)
     } catch (error) {
         console.log(error);
         console.log(error.message);

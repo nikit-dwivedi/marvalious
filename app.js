@@ -1,11 +1,10 @@
-//----------import dependencies-------------------------------
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const app = express();
 
 //----------import files--------------------------------------
-const {success, badRequest }  =  require('./src/api/v1/helpers/response_helper')
+const { success, badRequest } = require('./src/api/v1/helpers/response_helper')
 const version1Index = require("./src/api/v1/index");
 
 
@@ -17,7 +16,7 @@ app.use(cors());
 //image path
 app.use('/static', express.static('static'))
 //body parsing
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 //----------redirect routes-----------------------------------
