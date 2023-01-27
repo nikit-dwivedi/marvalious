@@ -5,7 +5,6 @@ const balanceSchema = new Schema({
 
     customId: {
         type: String,
-        required:true
     },
     investAmount: {
         type: Number,
