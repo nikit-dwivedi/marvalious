@@ -269,15 +269,15 @@ exports.editBalance = async (req, res) => {
         if (balanceData) {
             const investAmount = req.body.investAmount
             const profit = req.body.profit
-            if (investAmount) {
+            if (!(typeof investAmount == undefined)) {
                 balanceData.investAmount = investAmount
             }
-            if (profit) {
+            if (!(typeof profit == undefined)) {
                 balanceData.profit = profit
             }
             const editBalance = new balanceModel(balanceData)
             const saveBalance = editBalance.save()
-            return saveBalance ? success(res, "balance edited") : badRequest(res, "balance cannot be edited")
+            return saveBalance ? success(res, "balance edited", saveBalance) : badRequest(res, "balance cannot be edited")
         }
     } catch (error) {
         return badRequest(res, "something went wrong")
