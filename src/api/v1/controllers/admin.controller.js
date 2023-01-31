@@ -338,7 +338,7 @@ exports.getCustomerById = async (req, res) => {
 exports.getCustomerPurchaseRigs = async (req, res) => {
     try {
         const customId = req.params.customId
-        const rigData = await partnerModel.find({ customId })
+        const rigData = await partnerModel.find({ customId }).sort({createdAt:-1})
         return rigData[0] ? success(res, "here is the purchsed rigs", rigData) : badRequest(res, "details not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
@@ -656,7 +656,6 @@ exports.totalInvestedAmount = async (req, res) => {
 exports.totalBookingAmount = async (req, res) => {
     try {
         const totalBookingAmount = await bookingModel.aggregate([{$match: {$and : [{isPurchased:false},{isRejected:false}]}}, { $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
-        console.log(totalBookingAmount);
         return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]) : badRequest(res, "booking amount not found")
     } catch (error) {
         return badRequest(res, "Something went wrong")
