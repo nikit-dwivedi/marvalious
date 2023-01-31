@@ -655,7 +655,8 @@ exports.totalInvestedAmount = async (req, res) => {
 
 exports.totalBookingAmount = async (req, res) => {
     try {
-        const totalBookingAmount = await bookingModel.aggregate([{ $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
+        const totalBookingAmount = await bookingModel.aggregate([{$match: {$and : [{isPurchased:false},{isRejected:false}]}}, { $group: { _id: null, totalAmount: { $sum: "$bookingAmount" } } }])
+        console.log(totalBookingAmount);
         return totalBookingAmount[0] ? success(res, "total booking amount", totalBookingAmount[0]) : badRequest(res, "booking amount not found")
     } catch (error) {
         return badRequest(res, "Something went wrong")
