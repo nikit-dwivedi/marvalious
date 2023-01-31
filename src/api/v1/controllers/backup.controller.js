@@ -3,7 +3,7 @@ const path = require('path')
 
 
 const DB_Name = 'Marvellous'
-const ARCHIVE_PATH = path.join(__dirname, 'Backup', `${DB_Name}.gzip`)
+const ARCHIVE_PATH = path.join(__dirname, 'public', `${DB_Name}.gzip`)
 
 backupMongoDB();
 
@@ -15,12 +15,12 @@ function backupMongoDB() {
     ])
     child.stdout.on('data', (data) => {
         console.log('stdout:\n', data);
-    })  
+    })
     child.stderr.on('data', (data) => {
         console.log('stderr:\n', Buffer.from(data).toString());
     })
     child.on('error', (error) => {
-        console.log('error:\n', error.message);
+        console.log('error:\n', error);
     })
     child.on('exit', (code, signal) => {
         if (code) console.log('Process exit with code:', code)
