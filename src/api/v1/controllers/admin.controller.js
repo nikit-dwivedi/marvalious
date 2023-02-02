@@ -1,5 +1,5 @@
 const { getAllCustomer } = require("../helpers/customer.helper")
-const { data2CSV, writeCsv } = require('../helpers/admin.helper')
+const { data2CSV, writeCsv, getAllCount } = require('../helpers/admin.helper')
 const { success, badRequest, unknownError } = require("../helpers/response_helper")
 const { addSlab, getSlab, addSlabSetting } = require("../helpers/slab.helper")
 const { getSlabSettingById, changeSlabToBooked } = require("../helpers/slab.helper");
@@ -18,7 +18,8 @@ const settlementModel = require("../models/settlement.model")
 const { roiPartnership } = require("../helpers/Roi.helper")
 const configModel = require('../models/config.model');
 const { nomineeModel } = require("../models/nominee.model");
-const fs = require('fs')
+const fs = require('fs');
+const { responseFormater } = require("../formatter/response.format");
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -698,6 +699,15 @@ exports.createCustomerReport = async (req, res) => {
         const filename = "customer.csv"
         await data2CSV(newData, path, subject, filename)
         return success(res, "converted to csv file")
+    } catch (error) {
+        return badRequest(res, "Something went wrong")
+    }
+}
+
+exports.totalCounts = async (req, res) => {
+    try {
+        const { status, message, data } = await getAllCount()
+        return status ? success(res, message, data) : badRequest(res , message)
     } catch (error) {
         return badRequest(res, "Something went wrong")
     }

@@ -4,12 +4,16 @@ const { generateAdminToken } = require("../middlewares/authToken")
 const adminModel = require("../models/admin.model")
 const balanceModel = require("../models/balance.model")
 const bankModel = require("../models/bank.model")
+const customerModel = require("../models/customer.model")
+const settlementModel = require('../models/settlement.model')
 const kycModel = require("../models/kyc.model")
 const slabModel = require("../models/slab.model")
 const slabSettingModel = require("../models/slabSetting.model")
 const { Parser } = require('@json2csv/plainjs')
 const fs = require('fs')
 const {sendMail} = require('../services/otp.service')
+const partnerModel = require("../models/patner.model")
+const { response } = require("express")
 
 
 
@@ -128,4 +132,21 @@ exports.data2CSV = async (data, path, subject , filename) => {
 
 exports.writeCsv = (data, path) => {
     fs.writeFileSync(path, data)
+}
+
+
+exports.getAllCount = async () => {
+    try {
+        const partners = await customerModel.countDocuments()
+        const totalPendingKyc = await kycModel.countDocuments({ isVerified : false })
+        const totalKyc = await kycModel.countDocuments({})
+        const settlements = await settlementModel.countDocuments()
+        const partnerships = await partnerModel.countDocuments() 
+        const totalCounts = {
+            partners, totalPendingKyc, totalKyc, settlements, partnerships
+        }    
+        return totalCounts ? responseFormater(true, "all counts", totalCounts):responseFormater(false, "no counts")
+    } catch (error) {
+       return responseFormater(false ,error.message)   
+    }
 }
