@@ -4,6 +4,7 @@ const router = express.Router();
 
 const { onboard, getCustomerById, addKycDetails, getKycDetails, addBankDetails, editBankDetails, getBankDetails, addNomineeDetails, getNomineeDetails, changeNomineeDetails, getRifInfo, purchaseRig, getAllRigOfUser, allRigSetting, addKycAndNominee, getKycAndNominee, editBankDetail, getBalanceUser, getSettlementOfUser } = require('../controllers/customer.controller');
 const { authenticateUser } = require('../middlewares/authToken');
+const { makePdf, renderPage } = require('../RECEIPT/receipt');
 
 
 
@@ -26,7 +27,9 @@ router.get('/kycinfo/nomineeinfo', authenticateUser, getKycAndNominee)
 router.get('/getBalanceUser', getBalanceUser)
 router.get('/settlement', authenticateUser, getSettlementOfUser)
 
-
+//---------------------------------------Receipt---------------------------------//
+router.get('/receipt', makePdf)
+router.get('/render', renderPage)
 
 
 module.exports = router;

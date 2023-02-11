@@ -570,7 +570,7 @@ exports.createBookingByAdmin = async (req, res) => {
 exports.getAllBooking = async (req, res) => {
     try {
         const customId = req.params.customId
-        const bookingList = await bookingModel.find({ customId, isPurchased: false })
+        const bookingList = await bookingModel.find({ customId, isPurchased: false }).sort({createdAt:-1})
         return bookingList[0] ? success(res, "booking details", bookingList) : badRequest(res, "booking cannot be found")
     } catch (error) {
         return badRequest(res, "Something went wrong")

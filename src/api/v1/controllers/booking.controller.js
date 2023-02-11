@@ -6,6 +6,10 @@ const balanceModel = require("../models/balance.model");
 const bookingModel = require("../models/booking.model");
 const slabSettingModel = require("../models/slabSetting.model");
 const transactionModel = require("../models/transaction.model");
+const customerModel = require("../models/customer.model");
+const { makePdf } = require("../RECEIPT/receipt");
+const { sendMailToCustomer } = require("../services/otp.service");
+const { bookingFormatter } = require("../formatter/data.format")
 
 
 
@@ -16,6 +20,7 @@ const createBooking = async (req, res) => {
             return badRequest(res, "please onboard first")
         }
         const customId = token.customId
+        const customerData = await customerModel.findOne({ customerId :customId})
         const data = req.body
         let index = {}
         for (let rigId in data) {
@@ -33,7 +38,8 @@ const createBooking = async (req, res) => {
             data.remainingAmount = remainingAmount
             index = new bookingModel(data)
             await index.save()
-
+            await makePdf(customerData.name, customerData.email, customerData.phone, bookingAmount )
+           
         }
         return index ? success(res, "booking is created") : badRequest(res, "booking not created")
     } catch (error) {
@@ -56,12 +62,12 @@ const getAllSlots = async (req, res) => {
 }
 const allBookings = async (req, res) => {
     try {
-        const bookingData = await bookingModel.find()
-        return bookingData ? success(res, "here is all the bookings", bookingData) : badRequest(res, "booking not found")
+        const bookingInfo = await bookingModel.find().select("-_id -__v")
+        return bookingInfo ? success(res, "here is all the bookings", bookingInfo) : badRequest(res, "booking not found")
     } catch (error) {
         return badRequest(res, "something went wrong")
     }
-}
+} 
 const allBookingUser = async (req, res) => {
     try {
         const token = parseJwt(req.headers.authorization)
