@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <title>Receipt</title>
+    <style>
+        body {
+            font-family: system-ui;
+            line-height: 1.5rem;
+            font-weight: 500;
+        }
+
+        .main-wrapper {
+            width: 95%;
+            margin: 0 auto;
+            /* padding: 0 10px; */
+        }
+
+        .head-section {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .head-section .logo img {
+            width: 190px;
+        }
+
+        .bill-to h4 {
+            font-size: 16px;
+            margin: 10px 0px;
+        }
+
+        .bill-to h3 {
+            font-size: 18px;
+            margin: 10px 0px;
+        }
+
+        .clr-gray {
+            color: #7A7373;
+        }
+
+        .mid-section {
+            padding: 50px 0px;
+        }
+
+        .mid-section h2 {
+            text-align: center;
+        }
+
+        .payment-sec {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 50px 0px;
+        }
+
+        .amount-box {
+            padding: 15px 25px;
+            text-align: center;
+            background: #E3881E;
+            border: 4px solid #464545;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 18px;
+        }
+
+        .pay-txt p {
+            margin: 0;
+        }
+
+        .pay-txt {
+            border-bottom: 1px solid #ddd;
+            margin: 15px 0px 10px 0px;
+        }
+
+        .info-txt {
+            margin-right: 20px;
+        }
+
+        .payment-info {
+            margin-right: 20px;
+        }
+
+        .foot-sec {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0px;
+            font-size: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-wrapper">
+        <div class="head-section">
+            <div class="logo">
+                <img src="https://res.cloudinary.com/fablo/image/upload/v1675948119/Marvellous_receipt/mm-fi_azfh1f.png"
+                    alt="logo" title="logo">
+            </div>
+            <div class="info">
+                <h2>Marvellous Info Soft</h2>
+                <p>A,6CM Tower Palasia<br> Indore 452018</p>
+            </div>
+            <div class="bill-to">
+                <h3 class="clr-gray">Bill To</h3>
+                <h3>
+                    <%= details.name %>
+                </h3>
+                <h4 class="clr-gray">
+                    <%= details.email %>
+                </h4>
+                <h4 class="clr-gray">
+                    <%= details.phone %>
+                </h4>
+            </div>
+        </div>
+        <div class="mid-section">
+            <h2>Payment Receipt</h2>
+            <div class="payment-sec">
+                <div class="payment-info">
+                    <p>Payment Date</p>
+                    <p>Reference Number</p>
+                    <p>Payment Mode</p>
+                    <p>Amount Received In Words</p>
+                </div>
+                <div class="info-txt">
+                    <div class="pay-txt">
+                        <p><Strong>
+                                <%= details.date %>
+                            </Strong></p>
+                    </div>
+                    <div class="pay-txt">
+                        <p><Strong>
+                                <%= details.referenceNo %>
+                            </Strong></p>
+                    </div>
+                    <div class="pay-txt">
+                        <p><Strong>Bank Transfer</Strong></p>
+                    </div>
+                    <div class="pay-txt">
+                        <p><Strong>
+                                <%= details.amountInWords %>
+                            </Strong></p>
+                    </div>
+                </div>
+                <div class="amount-box">
+                    <p>Amount Received</p>
+                    <p>₹ <%= details.amount %>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <p>Computer generated receipt, No signature required</p>
+        <div class="foot-sec">
+            <div class="footer-txt">
+                <p>A,6CM Tower Palasia Indore 452018</p>
+            </div>
+            <div class="footer-txt">
+                <p>Phone: +91 8962281128</p>
+            </div>
+            <div class="footer-txt">
+                <p>Email: care.marvellous.info@gmail.com</p>
+            </div>
+            <div class="footer-txt">
+                <p>www.marvellousinfo.com</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

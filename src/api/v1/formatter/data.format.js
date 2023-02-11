@@ -11,7 +11,7 @@ module.exports = {
         const otp = Math.floor(Math.random() * (9999 - 1000) + 1000)
         const reqId = randomBytes(4).toString('hex')
         const date = d.getDate()
-        return { userId,phone,date }
+        return { userId, phone, date }
     },
     adminFormatter: (phone) => {
         const adminId = randomBytes(4).toString('hex')
@@ -96,6 +96,15 @@ module.exports = {
             date: dateFormatter(),
             expireDate: dateFormatter(rigData.locking)
         }
+    }, 
+     bookingFormatter :(customerData, bookings) => {
+        const name = customerData.name
+        const phone = customerData.phone
+        const percent = bookings.percent
+        const slot = bookings.percent
+        const bookingAmount = bookings.bookingAmount
+         const remainingAmount = bookings.bookingAmount
+         return { name, phone, percent, slot, bookingAmount, remainingAmount }
     }
 }
 const dateFormatter = (locking = false) => {

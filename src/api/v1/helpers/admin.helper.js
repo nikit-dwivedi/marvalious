@@ -14,6 +14,7 @@ const fs = require('fs')
 const {sendMail} = require('../services/otp.service')
 const partnerModel = require("../models/patner.model")
 const { response } = require("express")
+const bookingModel = require("../models/booking.model")
 
 
 
@@ -142,8 +143,9 @@ exports.getAllCount = async () => {
         const totalKyc = await kycModel.countDocuments({})
         const settlements = await settlementModel.countDocuments({ status: 'Processing' })
         const partnerships = await partnerModel.countDocuments() 
+        const bookings = await bookingModel.countDocuments()
         const totalCounts = {
-            partners, totalPendingKyc, totalKyc, settlements, partnerships
+            partners, totalPendingKyc, totalKyc, settlements, partnerships, bookings
         }    
         return totalCounts ? responseFormater(true, "all counts", totalCounts):responseFormater(false, "no counts")
     } catch (error) {

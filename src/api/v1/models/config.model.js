@@ -3,7 +3,7 @@ const Schema = mongoose.Schema
 
 
 const configSchema = new mongoose.Schema({
-    
+
     version: {
         type: String,
     },
@@ -12,6 +12,10 @@ const configSchema = new mongoose.Schema({
     },
     message: {
         type: String
+    },
+    systemReferenceNo: {
+        type: Number,
+        default:200                                                                    
     }
 }, { timestamps: true })
 
