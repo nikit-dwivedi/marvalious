@@ -143,7 +143,7 @@ exports.getAllCount = async () => {
         const totalKyc = await kycModel.countDocuments({})
         const settlements = await settlementModel.countDocuments({ status: 'Processing' })
         const partnerships = await partnerModel.countDocuments() 
-        const bookings = await bookingModel.countDocuments()
+        const bookings = await bookingModel.countDocuments({ isPurchased: false, isRejected: false })
         const totalCounts = {
             partners, totalPendingKyc, totalKyc, settlements, partnerships, bookings
         }    
