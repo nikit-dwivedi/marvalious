@@ -62,7 +62,7 @@ const getAllSlots = async (req, res) => {
 }
 const allBookings = async (req, res) => {
     try {
-        const bookingInfo = await bookingModel.find().select("-_id -__v")
+        const bookingInfo = await bookingModel.find({ isPurchased: false, isRejected: false }).sort({ createdAt: -1 }).select("-_id -__v")
         return bookingInfo ? success(res, "here is all the bookings", bookingInfo) : badRequest(res, "booking not found")
     } catch (error) {
         return badRequest(res, "something went wrong")

@@ -15,6 +15,7 @@ exports.addPartner = async (customId, rigData) => {
 exports.getPartnerOfUser = async (customId) => {
     try {
         const partnerData = await partnerModel.find({ customId }).select("-_id -__v").sort({ createdAt: -1 })
+        // const currentTime = 
         return partnerData[0] ? responseFormater(true, "Purchased rig list", partnerData) : responseFormater(false, "no rig purchased")
     } catch (error) {
         return responseFormater(false, error.message)

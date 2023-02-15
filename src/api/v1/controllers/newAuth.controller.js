@@ -25,7 +25,6 @@ exports.login = async (req, res) => {
             let occupation = ""
             let isOnboarded
             const customData = await customerById(userData.userId)
-            console.log(customData);
             if (customData.status) {
                 token = generateUserToken(customData.data)
                 name = customData.data.name

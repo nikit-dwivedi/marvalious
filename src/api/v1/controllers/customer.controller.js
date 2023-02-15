@@ -87,7 +87,6 @@ module.exports = {
     },
     editBankDetails: async (req, res) => {
         try {
-            // console.log("=======");
             const token = parseJwt(req.headers.authorization)
             if (!token.customId) {
                 return badRequest(res, "please onboard first")
@@ -122,7 +121,6 @@ module.exports = {
                 return bankDetails ? success(res, "bank details updated", bankDetails) : badRequest(res, "bank details cannot be edited")
             }
         } catch (error) {
-            console.log(error.message);
             return badRequest(res, "something went wrong")
         }
     },
@@ -145,7 +143,6 @@ module.exports = {
                 return badRequest(res, "please onboard first")
             }
             const { status, message, data } = await getNominee(token.customId)
-            console.log(data);
             return status ? success(res, message, data) : badRequest(res, message)
         } catch (error) {
             return unknownError(res, error.message)
@@ -194,7 +191,6 @@ module.exports = {
                     balanceData.investAmount = balanceData.investAmount + rigData.amount
                     await balanceData.save()
                 } 
-                // await bookingModel.findOneAndUpdate({ rigId }, { isPurchased: true })
                 const data = {
                     customId: token.customId,
                     type: "Invested",
@@ -205,7 +201,6 @@ module.exports = {
             }
             return success(res, message)
         } catch (error) {
-            console.log(error);
             return unknownError(res, error.message)
         }
     },
@@ -246,8 +241,7 @@ module.exports = {
                     aadhaarBack: req.body.aadhaarBack,
                     panNumber: req.body.panNumber,
                     panFront: req.body.panFront
-                }
-                //   console.log(kycData);     
+                }  
                 const nomineeData = {
                     customerId: customId,
                     nomineeName: req.body.nomineeName,
@@ -267,7 +261,6 @@ module.exports = {
                 badRequest(res, "kyc is already added")
             }
         } catch (error) {
-            console.log(error);
             return badRequest(res, "something went wrong")
         }
     },
@@ -304,7 +297,6 @@ module.exports = {
             const balanceDetails = await balanceModel.findOne({ customId })
             return balanceDetails ? success(res, "here is the balance", balanceDetails) : badRequest(res, "balance not found")
         } catch (error) {
-            console.log(error.message);
             badRequest(res, "something went wrong")
         }
     },
