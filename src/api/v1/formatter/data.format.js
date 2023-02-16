@@ -111,7 +111,7 @@ module.exports = {
             customId: partner.customId,
             expireDate: partner.expireDate,
             isActive: partner.isActive,
-            profit: partner.isActive,
+            profit: partner.profit,
             createdAt: partner.createdAt,
             updatedAt: partner.updatedAt,
             daysLeftForRoi:noOfDays
