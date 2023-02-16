@@ -97,6 +97,26 @@ module.exports = {
             expireDate: dateFormatter(rigData.locking)
         }
     }, 
+    partnershipFormatter: (partner,noOfDays) => {
+        // const partnerId = randomBytes(4).toString('hex')
+        return {
+            slabInfo: {
+                slabSettingId: partner.slabInfo.slabSettingId,
+                amount: partner.slabInfo.amount,
+                percent: partner.slabInfo.percent,
+                interest: partner.slabInfo.interest,
+                locking: partner.slabInfo.locking,
+            },
+            partnerId: partner.partnerId,
+            customId: partner.customId,
+            expireDate: partner.expireDate,
+            isActive: partner.isActive,
+            profit: partner.isActive,
+            createdAt: partner.createdAt,
+            updatedAt: partner.updatedAt,
+            daysLeftForRoi:noOfDays
+        }
+    }, 
      bookingFormatter :(customerData, bookings) => {
         const name = customerData.name
         const phone = customerData.phone
