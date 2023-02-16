@@ -109,6 +109,7 @@ module.exports = {
             },
             partnerId: partner.partnerId,
             customId: partner.customId,
+            date:partner.date,
             expireDate: partner.expireDate,
             isActive: partner.isActive,
             profit: partner.profit,
