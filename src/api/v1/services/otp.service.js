@@ -8,7 +8,7 @@ const sendMail = async (attachment, subject, filename) => {
     try {
         let msg = {
             to: 'care.marvellous.info@gmail.com',
-            from: 'nikitdwivedi@fabloplatforms.com',
+            from: 'acc.marvellous.info@gmail.com',
             subject: subject,
             text: 'Below is your report',
             attachments: [{
@@ -31,7 +31,7 @@ const sendMailToAdmin = async (name) => {
     try {
         let msg = {
             to: 'care.marvellous.info@gmail.com',
-            from: 'nikitdwivedi@fabloplatforms.com',
+            from: 'acc.marvellous.info@gmail.com',
             subject: 'User onboarded',
             text: `A new user ${name} has onboarded`,
         }
@@ -41,13 +41,13 @@ const sendMailToAdmin = async (name) => {
     }
 }
 
-const sendMailToCustomer = async (attachment, subject, filename , to) => {
+const sendMailToCustomer = async (attachment,filename , to) => {
     try {
         let msg = {
             to: to,
-            from: 'nikitdwivedi@fabloplatforms.com',
-            subject: subject,
-            text: 'Below is your report',
+            from: 'acc.marvellous.info@gmail.com',
+            subject: "Receipt From Marvellous Info Soft",
+            text: 'Below is your Receipt',
             attachments: [{
                 content: attachment,
                 filename: filename,
@@ -62,7 +62,7 @@ const sendMailToCustomer = async (attachment, subject, filename , to) => {
         await sgMail.send(msg)
     } catch (error) {
         
-        console.log(error);
+        console.log(error.message);
     }
 }
 

@@ -199,6 +199,8 @@ module.exports = {
                 const transaction = new transactionModel(data)
                 await transaction.save()
             }
+            const customerData = await customerModel.findOne({ customerId: token.customId }).select("name email phone")
+            await makePdf(customerData.name, customerData.email, customerData.phone, rigData.amount)
             return success(res, message)
         } catch (error) {
             return unknownError(res, error.message)

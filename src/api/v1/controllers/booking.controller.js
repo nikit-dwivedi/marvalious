@@ -8,8 +8,7 @@ const slabSettingModel = require("../models/slabSetting.model");
 const transactionModel = require("../models/transaction.model");
 const customerModel = require("../models/customer.model");
 const { makePdf } = require("../RECEIPT/receipt");
-const { sendMailToCustomer } = require("../services/otp.service");
-const { bookingFormatter } = require("../formatter/data.format")
+
 
 
 
@@ -20,7 +19,7 @@ const createBooking = async (req, res) => {
             return badRequest(res, "please onboard first")
         }
         const customId = token.customId
-        const customerData = await customerModel.findOne({ customerId :customId})
+        const customerData = await customerModel.findOne({ customerId: customId }).select("name email phone")
         const data = req.body
         let index = {}
         for (let rigId in data) {
@@ -149,8 +148,11 @@ const purchaseBooking = async (req, res) => {
                 }
                 const transaction = new transactionModel(data)
                 await transaction.save()
-            }
-            return success(res, message)
+        }
+        const bookingData = await bookingModel.findOne({ customId: token.customId }).select("remainingAmount")
+        const customerData = await customerModel.findOne({ customerId: token.customId }).select("name email phone")
+        await makePdf(customerData.name, customerData.email, customerData.phone, bookingData.remainingAmount)
+        return success(res, message)
         
     } catch (error) {
         return badRequest(res, "something went wrong")
