@@ -47,7 +47,7 @@ const sendMailToCustomer = async (attachment,filename , to) => {
             to: to,
             from: 'acc.marvellous.info@gmail.com',
             subject: "Receipt From Marvellous Info Soft",
-            text: 'Below is your Receipt',
+            text: `Thank you for signing up on Marvellous Mining.\n\nWe are committed to your regular earnings.\n\nDo not hesitate to contact us for any queries.(8962281128)`,
             attachments: [{
                 content: attachment,
                 filename: filename,
