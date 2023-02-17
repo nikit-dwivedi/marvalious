@@ -192,6 +192,8 @@ exports.addPartnershipByAdmin = async (req, res) => {
             const transaction = new transactionModel(data)
             await transaction.save()
         }
+        const customerData = await customerModel.findOne({ customerId: customId }).select("name email phone")
+        await makePdf(customerData.name, customerData.email, customerData.phone, rigData.amount)
         return success(res, message)
     } catch (error) {
         return badRequest(res, "something went wrong")
@@ -560,6 +562,8 @@ exports.createBookingByAdmin = async (req, res) => {
             data.remainingAmount = remainingAmount
             index = new bookingModel(data)
             await index.save()
+            const customerData = await customerModel.findOne({ customerId: customId }).select("name email phone")
+            await makePdf(customerData.name, customerData.email, customerData.phone, bookingAmount)
         }
         return index ? success(res, "booking is created") : badRequest(res, "booking not created")
     } catch (error) {
@@ -609,6 +613,9 @@ exports.purchaseBooking = async (req, res) => {
             const transaction = new transactionModel(data)
             await transaction.save()
         }
+        const bookingData = await bookingModel.findOne({ customId: token.customId }).select("remainingAmount")
+        const customerData = await customerModel.findOne({ customerId: customId }).select("name email phone")
+        await makePdf(customerData.name, customerData.email, customerData.phone, bookingData.remainingAmount)
         return success(res, message)
     } catch (error) {
         return badRequest(res, "Something went wrong")
