@@ -20,6 +20,7 @@ const configModel = require('../models/config.model');
 const { nomineeModel } = require("../models/nominee.model");
 const fs = require('fs');
 const { responseFormater } = require("../formatter/response.format");
+const { makePdf } = require("../RECEIPT/receipt")
 
 exports.registerAdmin = async (req, res) => {
     try {
@@ -613,11 +614,12 @@ exports.purchaseBooking = async (req, res) => {
             const transaction = new transactionModel(data)
             await transaction.save()
         }
-        const bookingData = await bookingModel.findOne({ customId: token.customId }).select("remainingAmount")
+        const bookingData = await bookingModel.findOne({ customId: customId }).select("remainingAmount")
         const customerData = await customerModel.findOne({ customerId: customId }).select("name email phone")
         await makePdf(customerData.name, customerData.email, customerData.phone, bookingData.remainingAmount)
         return success(res, message)
     } catch (error) {
+        console.log(error);
         return badRequest(res, "Something went wrong")
     }
 }
