@@ -19,7 +19,7 @@ exports.makePdf = async (name, email, phone, amount) => {
         amountInWords: this.amountInWords(amount) + " ONLY",
         amount: amount
     }
-    await page.goto(`http://localhost:4201/v1/customer/render?name=${details.name}&email=${details.email}&phone=${details.phone}&date=${details.date}&referenceNo=${details.referenceNo}&amountInWords=${details.amountInWords}&amount=${details.amount}`, {
+    await page.goto(`http://139.59.60.119:4201/v1/customer/render?name=${details.name}&email=${details.email}&phone=${details.phone}&date=${details.date}&referenceNo=${details.referenceNo}&amountInWords=${details.amountInWords}&amount=${details.amount}`, {
         waitUntil: 'networkidle0'
     })
     const pdf = await page.pdf({
