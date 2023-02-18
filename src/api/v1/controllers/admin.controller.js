@@ -591,7 +591,7 @@ exports.purchaseBooking = async (req, res) => {
         if (!rigStatus) {
             return badRequest(res, rigMessage)
         }
-        const { status, message } = await addPartner(customId, rigData)
+        const { status, message } = await addPartner(customId, rigData)      
         if (!status) {
             return badRequest(res, message)
         }
