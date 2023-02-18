@@ -7,7 +7,7 @@ const { sendMailToCustomer } = require('../services/otp.service');
 const configModel = require('../models/config.model');
 
 exports.makePdf = async (name, email, phone, amount) => {
-    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] })
+    const browser = await puppeteer.launch()
     const page = await browser.newPage()
     const receiptNo = await this.createReferenceNo()
     const details = {
